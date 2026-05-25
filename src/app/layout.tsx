@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { AIProvider } from "@/providers/AIProvider";
+import "@atlaskit/css-reset";
+import "@atlaskit/tokens/css/atlassian-light.css";
+import "@atlaskit/tokens/css/atlassian-dark.css";
 import "./globals.css";
 
-// Plus Jakarta Sans — primary UI and display font
 const jakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -11,7 +13,6 @@ const jakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
-// JetBrains Mono — code, metrics, labels, chart axes
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#080913",
+  themeColor: "#1D2125",
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
@@ -42,7 +43,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${jakartaSans.variable} ${jetbrainsMono.variable} dark`}
+      data-color-mode="dark"
+      data-theme="dark"
+      className={`${jakartaSans.variable} ${jetbrainsMono.variable}`}
     >
       <body className="antialiased">
         <AIProvider>{children}</AIProvider>
