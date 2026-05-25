@@ -32,10 +32,10 @@ export default function DashboardLayout({
   }, [toggleCommandPalette]);
 
   return (
-    <div className="min-h-screen bg-void-DEFAULT noise-texture">
-      {/* Background mesh */}
+    <div className="min-h-screen bg-void-50">
+      {/* Subtle background depth */}
       <div className="fixed inset-0 bg-mesh-gradient pointer-events-none" />
-      <div className="fixed inset-0 dot-grid opacity-40 pointer-events-none" />
+      <div className="fixed inset-0 dot-grid opacity-20 pointer-events-none" />
 
       <Sidebar />
       <TopBar />
