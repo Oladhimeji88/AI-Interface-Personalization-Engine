@@ -3,45 +3,36 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-  LayoutDashboard,
-  Palette,
-  BarChart3,
-  Lightbulb,
-  Edit3,
-  Settings,
-  Brain,
-  ChevronLeft,
-  Command,
-  Layers,
-  Sparkles,
-} from "lucide-react";
 import { useUIStore } from "@/lib/store/ui.store";
 import { usePersonalizationStore } from "@/lib/store/personalization.store";
 import { AIStatusBadge } from "@/components/ui/AIStatusBadge";
 import { getTimeOfDayGreeting } from "@/lib/utils";
+import {
+  SquaresFour, ChartBar, Lightbulb, Palette, PencilSimple, Stack,
+  GearSix, Brain, CaretLeft, Command, Sparkle,
+} from "@/components/ui/icons";
 
 const NAV_ITEMS = [
   {
     group: "Core",
     items: [
-      { href: "/dashboard",  label: "Dashboard",        icon: LayoutDashboard, accent: "quantum" },
-      { href: "/analytics",  label: "Analytics",        icon: BarChart3,        accent: "synapse" },
-      { href: "/insights",   label: "Behavior Insights", icon: Lightbulb,       accent: "plasma"  },
+      { href: "/dashboard",  label: "Dashboard",        Icon: SquaresFour, accent: "quantum" },
+      { href: "/analytics",  label: "Analytics",        Icon: ChartBar,    accent: "synapse" },
+      { href: "/insights",   label: "Behavior Insights", Icon: Lightbulb,  accent: "plasma"  },
     ],
   },
   {
     group: "Personalization",
     items: [
-      { href: "/personalize", label: "Personalize",  icon: Palette, accent: "neural"   },
-      { href: "/editor",      label: "Live Editor",   icon: Edit3,   accent: "quantum"  },
-      { href: "/themes",      label: "Themes",        icon: Layers,  accent: "neural"   },
+      { href: "/personalize", label: "Personalize",  Icon: Palette,       accent: "neural"   },
+      { href: "/editor",      label: "Live Editor",  Icon: PencilSimple,  accent: "quantum"  },
+      { href: "/themes",      label: "Themes",       Icon: Stack,         accent: "neural"   },
     ],
   },
   {
     group: "System",
     items: [
-      { href: "/settings", label: "Settings", icon: Settings, accent: "default" },
+      { href: "/settings", label: "Settings", Icon: GearSix, accent: "default" },
     ],
   },
 ] as const;
@@ -53,14 +44,14 @@ const accentIcon: Record<Accent, string> = {
   neural:  "text-neural-400",
   synapse: "text-synapse-400",
   plasma:  "text-plasma-500",
-  default: "text-white/45",
+  default: "text-white/50",
 };
 
 const accentActive: Record<Accent, string> = {
-  quantum: "bg-quantum-400/[0.10] border-quantum-400/[0.18] text-quantum-300",
-  neural:  "bg-neural-400/[0.10]  border-neural-400/[0.18]  text-neural-300",
-  synapse: "bg-synapse-400/[0.10] border-synapse-400/[0.18] text-synapse-300",
-  plasma:  "bg-plasma-500/[0.10]  border-plasma-500/[0.18]  text-plasma-400",
+  quantum: "bg-quantum-400/[0.09] border-quantum-400/[0.18] text-quantum-300",
+  neural:  "bg-neural-400/[0.09]  border-neural-400/[0.18]  text-neural-300",
+  synapse: "bg-synapse-400/[0.09] border-synapse-400/[0.18] text-synapse-300",
+  plasma:  "bg-plasma-500/[0.09]  border-plasma-500/[0.18]  text-plasma-400",
   default: "bg-white/[0.06]       border-white/[0.10]        text-white/80",
 };
 
@@ -80,18 +71,17 @@ export function Sidebar() {
         sidebarCollapsed ? "w-16" : "w-[var(--sidebar-width)]"
       )}
     >
-      {/* ── Logo / Brand ──────────────────────────────────────────────── */}
+      {/* ── Brand ───────────────────────────────────────────────── */}
       <div
         className={cn(
           "flex items-center flex-shrink-0 border-b border-white/[0.055]",
-          "h-[var(--header-height)] px-4",
-          sidebarCollapsed ? "justify-center px-3" : "justify-between"
+          "h-[var(--header-height)]",
+          sidebarCollapsed ? "px-3 justify-center" : "px-4 justify-between"
         )}
       >
         <div className={cn("flex items-center gap-3", sidebarCollapsed && "justify-center")}>
-          {/* Logo mark */}
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-quantum-400 to-neural-500 flex items-center justify-center flex-shrink-0 shadow-quantum-sm">
-            <Brain className="w-4 h-4 text-white" />
+            <Brain size={16} weight="fill" className="text-white" />
           </div>
           {!sidebarCollapsed && (
             <div>
@@ -110,21 +100,21 @@ export function Sidebar() {
             type="button"
             onClick={toggleSidebar}
             aria-label="Collapse sidebar"
-            className="w-7 h-7 rounded-md flex items-center justify-center text-white/20 hover:text-white/55 hover:bg-white/[0.05] transition-all duration-150"
+            className="w-7 h-7 rounded-md flex items-center justify-center text-white/22 hover:text-white/55 hover:bg-white/[0.05] transition-all duration-150"
           >
-            <ChevronLeft className="w-3.5 h-3.5" />
+            <CaretLeft size={14} weight="bold" />
           </button>
         )}
       </div>
 
-      {/* ── AI Status ─────────────────────────────────────────────────── */}
+      {/* ── AI Status ───────────────────────────────────────────── */}
       {!sidebarCollapsed && (
         <div className="px-4 py-2.5 border-b border-white/[0.055]">
           <AIStatusBadge className="w-full justify-center" size="sm" />
         </div>
       )}
 
-      {/* ── Navigation ────────────────────────────────────────────────── */}
+      {/* ── Navigation ──────────────────────────────────────────── */}
       <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-6">
         {NAV_ITEMS.map((group) => (
           <div key={group.group}>
@@ -138,8 +128,8 @@ export function Sidebar() {
                 const isActive =
                   pathname === item.href ||
                   pathname.startsWith(item.href + "/");
-                const Icon = item.icon;
                 const accent = item.accent as Accent;
+                const { Icon } = item;
 
                 return (
                   <li key={item.href}>
@@ -147,25 +137,25 @@ export function Sidebar() {
                       href={item.href}
                       title={sidebarCollapsed ? item.label : undefined}
                       className={cn(
-                        "relative flex items-center gap-2.5 px-2 py-2 rounded-lg",
-                        "text-[13px] font-medium transition-all duration-150 group",
+                        "flex items-center gap-2.5 px-2 py-2 rounded-lg border",
+                        "text-[13px] font-medium transition-all duration-150",
                         sidebarCollapsed && "justify-center",
                         isActive
-                          ? cn("border", accentActive[accent])
-                          : "text-white/40 hover:text-white/72 hover:bg-white/[0.04] border border-transparent"
+                          ? accentActive[accent]
+                          : "text-white/40 hover:text-white/72 hover:bg-white/[0.04] border-transparent"
                       )}
                     >
                       <Icon
+                        size={sidebarCollapsed ? 20 : 16}
+                        weight={isActive ? "bold" : "regular"}
                         className={cn(
                           "flex-shrink-0 transition-colors duration-150",
-                          sidebarCollapsed ? "w-[18px] h-[18px]" : "w-4 h-4",
                           isActive ? accentIcon[accent] : "text-current"
                         )}
                       />
                       {!sidebarCollapsed && (
                         <span className="flex-1 truncate">{item.label}</span>
                       )}
-                      {/* Unresolved recs badge */}
                       {!sidebarCollapsed &&
                         item.href === "/personalize" &&
                         unresolvedRecs.length > 0 && (
@@ -182,21 +172,16 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* ── Footer ────────────────────────────────────────────────────── */}
+      {/* ── Footer ──────────────────────────────────────────────── */}
       {!sidebarCollapsed && (
         <div className="p-3 border-t border-white/[0.055] space-y-1">
-          {/* Command palette shortcut */}
+          {/* ⌘K trigger */}
           <button
             type="button"
             onClick={openCommandPalette}
-            className={cn(
-              "w-full flex items-center gap-2 px-3 py-2 rounded-lg",
-              "bg-white/[0.03] border border-white/[0.06]",
-              "text-[12px] text-white/22 hover:text-white/48 transition-all duration-150",
-              "font-mono"
-            )}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-[12px] text-white/22 hover:text-white/48 transition-all duration-150 font-mono"
           >
-            <Command className="w-3.5 h-3.5 flex-shrink-0" />
+            <Command size={13} weight="regular" className="flex-shrink-0" />
             <span className="flex-1 text-left">Command palette</span>
             <span className="flex items-center gap-0.5">
               <kbd className="px-1 py-0.5 rounded bg-white/[0.04] border border-white/[0.07] text-[10px] leading-none">⌘</kbd>
@@ -210,19 +195,17 @@ export function Sidebar() {
               <span className="text-[11px] font-bold text-white">U</span>
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-[13px] font-semibold text-white/72 truncate leading-tight">
-                User
-              </div>
+              <div className="text-[13px] font-semibold text-white/72 truncate leading-tight">User</div>
               <div className="text-[10px] font-mono text-white/25 truncate leading-tight mt-0.5">
                 {getTimeOfDayGreeting()}
               </div>
             </div>
-            <Sparkles className="w-3.5 h-3.5 text-neural-400 flex-shrink-0" />
+            <Sparkle size={14} weight="duotone" className="text-neural-400 flex-shrink-0" />
           </div>
         </div>
       )}
 
-      {/* Expand toggle when collapsed */}
+      {/* Expand when collapsed */}
       {sidebarCollapsed && (
         <div className="p-2 border-t border-white/[0.055]">
           <button
@@ -231,7 +214,7 @@ export function Sidebar() {
             aria-label="Expand sidebar"
             className="w-full h-9 flex items-center justify-center rounded-lg text-white/20 hover:text-white/55 hover:bg-white/[0.05] transition-all duration-150"
           >
-            <ChevronLeft className="w-4 h-4 rotate-180" />
+            <CaretLeft size={16} weight="bold" className="rotate-180" />
           </button>
         </div>
       )}
