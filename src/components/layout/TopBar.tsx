@@ -1,14 +1,13 @@
 "use client";
 
-import { Bell, Search, Zap, ChevronRight } from "lucide-react";
 import { useUIStore } from "@/lib/store/ui.store";
 import { usePersonalizationStore } from "@/lib/store/personalization.store";
 import { AIStatusBadge } from "@/components/ui/AIStatusBadge";
 import { cn } from "@/lib/utils";
+import { Bell, MagnifyingGlass, Lightning, CaretRight } from "@/components/ui/icons";
 
 export function TopBar() {
   const { breadcrumbs, notificationCount, openCommandPalette, focusMode } = useUIStore();
-  const { profile } = usePersonalizationStore();
 
   return (
     <header
@@ -17,21 +16,23 @@ export function TopBar() {
         "left-[var(--sidebar-width)]",
         "flex items-center justify-between px-6",
         "border-b border-white/[0.055]",
-        "bg-void-DEFAULT/88 backdrop-blur-xl",
+        "bg-void-DEFAULT/90 backdrop-blur-xl",
         "transition-all duration-300 ease-spring",
         focusMode && "opacity-0 pointer-events-none"
       )}
     >
-      {/* ── Breadcrumbs ───────────────────────────────────────────────── */}
+      {/* ── Breadcrumbs ────────────────────────────────────────── */}
       <div className="flex items-center gap-1">
         {breadcrumbs.length > 0 ? (
           breadcrumbs.map((crumb, i) => (
             <div key={crumb.href} className="flex items-center gap-1">
-              {i > 0 && <ChevronRight className="w-3 h-3 text-white/15" />}
+              {i > 0 && <CaretRight size={10} weight="bold" className="text-white/15" />}
               <span
                 className={cn(
-                  "text-[13px] font-medium",
-                  i === breadcrumbs.length - 1 ? "text-white/78" : "text-white/28"
+                  "text-[13px]",
+                  i === breadcrumbs.length - 1
+                    ? "font-semibold text-white/80"
+                    : "font-normal text-white/28"
                 )}
               >
                 {crumb.label}
@@ -48,12 +49,11 @@ export function TopBar() {
         )}
       </div>
 
-      {/* ── Right Actions ─────────────────────────────────────────────── */}
+      {/* ── Actions ────────────────────────────────────────────── */}
       <div className="flex items-center gap-2">
-        {/* Live AI status */}
         <AIStatusBadge size="sm" showLabel={false} />
 
-        {/* Search / command shortcut */}
+        {/* Search */}
         <button
           type="button"
           onClick={openCommandPalette}
@@ -65,14 +65,14 @@ export function TopBar() {
             "transition-all duration-150"
           )}
         >
-          <Search className="w-3.5 h-3.5" />
+          <MagnifyingGlass size={13} weight="regular" />
           <span className="hidden sm:block">Search…</span>
           <kbd className="hidden sm:block px-1.5 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-[10px] leading-none ml-1">
             ⌘K
           </kbd>
         </button>
 
-        {/* Adapt trigger */}
+        {/* Adapt */}
         <button
           type="button"
           onClick={() => usePersonalizationStore.getState().adaptProfile()}
@@ -84,17 +84,17 @@ export function TopBar() {
             "transition-all duration-150"
           )}
         >
-          <Zap className="w-3 h-3" />
+          <Lightning size={12} weight="fill" />
           <span className="hidden sm:block">Adapt</span>
         </button>
 
         {/* Notifications */}
         <button
           type="button"
-          aria-label={`${notificationCount} notifications`}
+          aria-label={notificationCount > 0 ? `${notificationCount} notifications` : "Notifications"}
           className="relative w-8 h-8 rounded-lg flex items-center justify-center bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07] hover:border-white/[0.10] transition-all duration-150"
         >
-          <Bell className="w-3.5 h-3.5 text-white/45" />
+          <Bell size={14} weight="regular" className="text-white/45" />
           {notificationCount > 0 && (
             <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-neural-500 text-white text-[9px] font-bold font-mono flex items-center justify-center">
               {notificationCount}
