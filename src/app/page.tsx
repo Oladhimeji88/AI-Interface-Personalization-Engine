@@ -1,469 +1,457 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
-  Brain,
-  Zap,
-  Eye,
-  Layers,
-  ArrowRight,
-  Sparkles,
-  Activity,
-  MousePointer2,
-  BarChart3,
-  ChevronRight,
-  Circle,
-} from "lucide-react";
+  Brain, Lightning, Eye, Stack, Pulse, Cursor,
+  ChartBar, ArrowRight, Sparkle, ArrowUpRight,
+  Check,
+} from "@/components/ui/icons";
 
-// ─── Animated background particles ──────────────────────────────────────────
-
-function ParticleField() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animFrame: number;
-    const particles: Array<{
-      x: number; y: number; vx: number; vy: number;
-      size: number; color: string; alpha: number;
-    }> = [];
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener("resize", resize);
-
-    const colors = ["rgba(14,165,233", "rgba(139,92,246", "rgba(16,185,129"];
-    for (let i = 0; i < 60; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        size: Math.random() * 1.5 + 0.5,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        alpha: Math.random() * 0.4 + 0.1,
-      });
-    }
-
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((p, i) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `${p.color},${p.alpha})`;
-        ctx.fill();
-
-        // Draw connections
-        particles.slice(i + 1).forEach((p2) => {
-          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-          if (dist < 120) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(255,255,255,${0.03 * (1 - dist / 120)})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        });
-      });
-
-      animFrame = requestAnimationFrame(draw);
-    };
-    draw();
-
-    return () => {
-      cancelAnimationFrame(animFrame);
-      window.removeEventListener("resize", resize);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 pointer-events-none"
-    />
-  );
-}
-
-// ─── Feature cards ────────────────────────────────────────────────────────
-
+// ── Feature data ───────────────────────────────────────────────────────────────
 const FEATURES = [
   {
-    icon: Brain,
+    Icon: Brain,
     title: "Behavioral AI Engine",
-    description:
-      "Continuously analyzes clicks, scrolls, keyboard patterns, and dwell time to build a precise model of how you work.",
-    accent: "quantum",
+    description: "Continuously analyses clicks, scrolls, keyboard cadence, and dwell time to build a precise model of how you work.",
     tag: "Core",
   },
   {
-    icon: Layers,
+    Icon: Stack,
     title: "Adaptive Layout System",
-    description:
-      "Dynamically reconfigures navigation, density, grid structure, and sidebar width based on your cognitive state.",
-    accent: "neural",
+    description: "Dynamically reconfigures navigation, density, grid structure, and sidebar width based on your cognitive state.",
     tag: "Layout",
   },
   {
-    icon: Eye,
+    Icon: Eye,
     title: "Cognitive Load Balancing",
-    description:
-      "Detects high mental load and automatically simplifies the interface — fewer distractions, clearer hierarchy.",
-    accent: "synapse",
+    description: "Detects high mental load and automatically simplifies the interface — fewer distractions, clearer hierarchy.",
     tag: "Intelligence",
   },
   {
-    icon: Zap,
+    Icon: Lightning,
     title: "Real-time Mutation Engine",
-    description:
-      "CSS token injection and dynamic theme switching happens in under 16ms — zero flicker, zero reload.",
-    accent: "plasma",
+    description: "CSS token injection and dynamic theme switching happen in under 16ms — zero flicker, zero reload.",
     tag: "Performance",
   },
   {
-    icon: Activity,
+    Icon: Pulse,
     title: "Emotional State Adaptation",
-    description:
-      "Time of day, session length, and interaction velocity are correlated to adapt the interface to your emotional context.",
-    accent: "quantum",
+    description: "Session length and interaction velocity are correlated to adapt the interface to your emotional context.",
     tag: "Emotional UX",
   },
   {
-    icon: MousePointer2,
+    Icon: Cursor,
     title: "Interaction Pattern Memory",
-    description:
-      "Remembers your preferred flows across sessions. Power users get compact density; explorers get guided paths.",
-    accent: "neural",
+    description: "Remembers your preferred flows across sessions. Power users get compact density; explorers get guided paths.",
     tag: "Memory",
   },
 ];
 
-const accentStyles = {
-  quantum: {
-    icon: "text-quantum-400 bg-quantum-400/10 border-quantum-400/20",
-    glow: "group-hover:shadow-quantum-sm",
-    badge: "bg-quantum-400/10 text-quantum-300 border-quantum-400/20",
-  },
-  neural: {
-    icon: "text-neural-400 bg-neural-400/10 border-neural-400/20",
-    glow: "group-hover:shadow-neural-sm",
-    badge: "bg-neural-400/10 text-neural-300 border-neural-400/20",
-  },
-  synapse: {
-    icon: "text-synapse-400 bg-synapse-400/10 border-synapse-400/20",
-    glow: "group-hover:shadow-synapse-sm",
-    badge: "bg-synapse-400/10 text-synapse-300 border-synapse-400/20",
-  },
-  plasma: {
-    icon: "text-plasma-500 bg-plasma-500/10 border-plasma-500/20",
-    glow: "group-hover:shadow-[0_0_24px_rgba(249,115,22,0.2)]",
-    badge: "bg-plasma-500/10 text-plasma-400 border-plasma-500/20",
-  },
-} as const;
-
-// ─── Stats ──────────────────────────────────────────────────────────────
-
 const STATS = [
-  { value: "<16ms", label: "UI adaptation latency" },
-  { value: "94%", label: "Pattern detection accuracy" },
-  { value: "∞", label: "Personalization dimensions" },
-  { value: "0", label: "Manual configuration needed" },
+  { value: "<16ms", label: "Adaptation latency" },
+  { value: "94%",   label: "Pattern accuracy"   },
+  { value: "12+",   label: "Interface dimensions" },
+  { value: "Zero",  label: "Manual config needed" },
 ];
 
-// ─── Main component ──────────────────────────────────────────────────────────
+const STEPS = [
+  {
+    n: "01",
+    Icon: Pulse,
+    title: "Signal Capture",
+    desc: "Every interaction — click velocity, scroll depth, keyboard patterns, idle states — is captured as behavioural signals.",
+  },
+  {
+    n: "02",
+    Icon: Brain,
+    title: "AI Inference",
+    desc: "Signals flow into the personalization engine which infers cognitive load, emotional state, and productivity mode.",
+  },
+  {
+    n: "03",
+    Icon: Lightning,
+    title: "Interface Mutation",
+    desc: "When confidence exceeds threshold, the engine mutates CSS design tokens — layout, density, colours, motion, typography.",
+  },
+  {
+    n: "04",
+    Icon: ChartBar,
+    title: "Memory & Evolution",
+    desc: "Every adaptation is logged. The model improves confidence across sessions, building a deeply personal interface fingerprint.",
+  },
+];
+
+// ── Hero image — replace src with your Higgsfield-generated image ──────────────
+// Prompt suggestion for Higgsfield:
+// "Futuristic minimal dashboard UI interface, clean white light theme, abstract
+//  data visualization, soft blue glow accents, professional tech product screenshot,
+//  cinematic render, ultra high resolution"
+const HERO_IMG   = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=85";
+
+// Showcase image — replace with Higgsfield output
+// Prompt: "Abstract neural network nodes connecting, soft blue light on white background,
+//  minimal elegant depth of field, product art direction"
+const SHOWCASE_IMG = "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1200&q=85";
+
+// Feature visual — replace with Higgsfield output
+// Prompt: "Person working on laptop, minimal bright workspace, soft natural light,
+//  productivity focus, wide shot, editorial photography style"
+const WORK_IMG   = "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1200&q=85";
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export default function LandingPage() {
-  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleMouse = (e: MouseEvent) => {
-      setMousePos({
-        x: e.clientX / window.innerWidth,
-        y: e.clientY / window.innerHeight,
-      });
-    };
-    window.addEventListener("mousemove", handleMouse, { passive: true });
-    return () => window.removeEventListener("mousemove", handleMouse);
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <div className="min-h-screen bg-void-DEFAULT overflow-hidden">
-      {/* Particle background */}
-      <ParticleField />
+    <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
 
-      {/* Mouse-reactive glow */}
-      <div
-        className="fixed inset-0 pointer-events-none transition-opacity duration-1000"
-        style={{
-          background: `radial-gradient(600px circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(14,165,233,0.07) 0%, transparent 60%)`,
-        }}
-      />
-
-      {/* Grid overlay */}
-      <div className="fixed inset-0 grid-bg opacity-30 pointer-events-none" />
-
-      {/* ── Nav ──────────────────────────────────────────── */}
-      <nav className="relative z-20 flex items-center justify-between px-8 py-5 border-b border-white/[0.05]">
+      {/* ── Nav ─────────────────────────────────────────────────────── */}
+      <nav
+        className={cn(
+          "fixed top-0 inset-x-0 z-50 flex items-center justify-between px-8 h-16",
+          "transition-all duration-300",
+          scrolled
+            ? "bg-white/95 backdrop-blur-lg border-b border-slate-100 shadow-sm"
+            : "bg-transparent"
+        )}
+      >
+        {/* Brand */}
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-quantum-400 to-neural-400 flex items-center justify-center">
-            <Brain className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-lg bg-quantum-400 flex items-center justify-center shadow-quantum-sm">
+            <span className="text-white font-display font-bold text-base leading-none">Ω</span>
           </div>
-          <div>
-            <span className="font-display font-bold text-white text-sm tracking-tight">AIPE</span>
-            <span className="text-white/20 mx-2 text-xs">·</span>
-            <span className="font-mono text-xs text-white/25">v0.1 beta</span>
-          </div>
+          <span className="font-display font-bold text-[15px] tracking-tight text-slate-900">
+            Omega
+          </span>
         </div>
-        <div className="flex items-center gap-4">
+
+        {/* Right */}
+        <div className="flex items-center gap-3">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg btn-primary text-sm"
+            className="hidden sm:flex items-center gap-1.5 text-[13px] font-medium text-slate-500 hover:text-slate-900 transition-colors"
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-700 text-white text-[13px] font-semibold transition-all duration-150 shadow-sm"
           >
             Open Platform
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight size={13} weight="bold" />
           </Link>
         </div>
       </nav>
 
-      {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative z-10 pt-24 pb-20 px-8 text-center max-w-5xl mx-auto">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass border border-neural-400/25 mb-8 animate-in stagger-1">
-          <Sparkles className="w-3 h-3 text-neural-300" />
-          <span className="text-xs font-mono font-medium text-neural-200">
-            AI-Native Interface Layer
-          </span>
-          <span className="w-px h-3 bg-white/10" />
-          <span className="live-dot" />
-          <span className="text-xs font-mono text-synapse-400">Live</span>
-        </div>
+      {/* ── Hero ────────────────────────────────────────────────────── */}
+      <section className="pt-32 pb-16 px-8">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
 
-        {/* Headline */}
-        <h1
-          className={cn(
-            "text-5xl sm:text-6xl lg:text-7xl font-display font-bold",
-            "text-white leading-[1.05] tracking-tight mb-6",
-            "animate-in stagger-2"
-          )}
-        >
-          The interface that
-          <br />
-          <span className="text-gradient-quantum">learns you</span>
-        </h1>
+          {/* Left — copy */}
+          <div>
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-quantum-400/8 border border-quantum-400/20 mb-8">
+              <span className="w-1.5 h-1.5 rounded-full bg-quantum-400" />
+              <span className="text-[12px] font-mono font-medium text-quantum-500">
+                AI-Native Interface Layer
+              </span>
+            </div>
 
-        {/* Sub */}
-        <p
-          className={cn(
-            "text-lg text-white/40 max-w-2xl mx-auto leading-relaxed mb-10",
-            "animate-in stagger-3"
-          )}
-        >
-          AIPE sits above your digital products as an AI-native operating layer —
-          continuously analyzing behavior, inferring cognitive state, and
-          reconstructing the interface in real time to match exactly how you work.
-        </p>
+            {/* Headline */}
+            <h1 className="text-5xl lg:text-[3.5rem] font-display font-bold text-slate-900 leading-[1.06] tracking-tight mb-6">
+              Your interface,{" "}
+              <span className="text-quantum-400">intelligently</span>
+              <br />
+              adapted.
+            </h1>
 
-        {/* CTAs */}
-        <div className="flex items-center justify-center gap-4 animate-in stagger-4">
-          <Link href="/dashboard" className="btn-primary text-base px-6 py-3">
-            <Brain className="w-4 h-4" />
-            Enter Platform
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link href="/personalize" className="btn-secondary text-base px-6 py-3">
-            <Layers className="w-4 h-4" />
-            View Personalization
-          </Link>
+            {/* Sub */}
+            <p className="text-[16px] text-slate-500 leading-relaxed mb-8 max-w-lg">
+              Omega sits above your digital products as an AI operating layer —
+              continuously learning your behaviour and reshaping the interface
+              in real time to match exactly how you work.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-wrap items-center gap-3 mb-10">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-quantum-400 hover:bg-quantum-500 text-white text-[14px] font-semibold transition-all duration-150 shadow-quantum-sm hover:shadow-quantum"
+              >
+                <Brain size={15} weight="fill" />
+                Enter Platform
+                <ArrowRight size={13} weight="bold" />
+              </Link>
+              <Link
+                href="/personalize"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-200 hover:border-slate-300 text-slate-700 text-[14px] font-medium transition-all duration-150 hover:bg-slate-50"
+              >
+                <Stack size={14} weight="regular" />
+                View Personalization
+              </Link>
+            </div>
+
+            {/* Inline proof */}
+            <div className="flex items-center gap-6">
+              {[
+                { v: "<16ms", l: "latency"  },
+                { v: "94%",   l: "accuracy" },
+                { v: "Zero",  l: "config"   },
+              ].map((s) => (
+                <div key={s.l}>
+                  <div className="text-[22px] font-display font-bold text-slate-900 leading-none">{s.v}</div>
+                  <div className="text-[11px] font-mono text-slate-400 mt-0.5">{s.l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right — product screenshot */}
+          {/* ↓ Replace the Image src with your Higgsfield-generated hero visual */}
+          <div className="relative">
+            {/* Browser mockup frame */}
+            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-2xl shadow-slate-300/40">
+              {/* Chrome bar */}
+              <div className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-50 border-b border-slate-200">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-300" />
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-300" />
+                <span className="w-2.5 h-2.5 rounded-full bg-green-300" />
+                <div className="ml-4 flex-1 h-5 bg-slate-200/70 rounded text-[10px] text-slate-400 font-mono px-2 flex items-center">
+                  omega.app/dashboard
+                </div>
+              </div>
+              {/* Screenshot */}
+              <Image
+                src={HERO_IMG}
+                alt="Omega dashboard — AI interface adapting in real time"
+                width={1200}
+                height={750}
+                className="w-full object-cover"
+                priority
+              />
+            </div>
+
+            {/* Floating badge */}
+            <div className="absolute -bottom-4 -left-4 flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-slate-200 shadow-lg">
+              <span className="live-dot" />
+              <span className="text-[11px] font-mono text-slate-600">
+                Adapting interface…
+              </span>
+            </div>
+
+            {/* Confidence badge */}
+            <div className="absolute -top-4 -right-4 flex items-center gap-1.5 px-3 py-2 rounded-xl bg-quantum-400 shadow-quantum-sm text-white">
+              <Brain size={12} weight="fill" />
+              <span className="text-[11px] font-mono font-semibold">92% confidence</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── Stats ────────────────────────────────────────── */}
-      <section className="relative z-10 py-12 border-y border-white/[0.05] animate-in stagger-5">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-0 divide-x divide-white/[0.05]">
-          {STATS.map((stat) => (
-            <div key={stat.value} className="px-8 text-center">
-              <div className="text-3xl font-display font-bold text-white mb-1 tabular-nums">
-                {stat.value}
+      {/* ── Stats strip ─────────────────────────────────────────────── */}
+      <section className="py-12 border-y border-slate-100 bg-slate-50">
+        <div className="max-w-4xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-0 divide-x divide-slate-200">
+          {STATS.map((s) => (
+            <div key={s.value} className="px-8 text-center">
+              <div className="text-3xl font-display font-bold text-slate-900 mb-1 tabular-nums">
+                {s.value}
               </div>
-              <div className="text-xs font-mono text-white/30">{stat.label}</div>
+              <div className="text-[11px] font-mono text-slate-400">{s.label}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── Features grid ────────────────────────────────── */}
-      <section className="relative z-10 py-24 px-8 max-w-6xl mx-auto">
-        <div className="text-center mb-16 animate-in stagger-1">
-          <span className="section-label mb-3 block">Capabilities</span>
-          <h2 className="text-3xl font-display font-bold text-white mb-4">
-            Every dimension of your interface, <br />
-            <span className="text-gradient-neural">adapted by AI</span>
-          </h2>
-          <p className="text-white/35 text-sm max-w-xl mx-auto">
-            From micro-interactions to macro-layout — AIPE operates across every
-            layer of the interface stack simultaneously.
-          </p>
-        </div>
+      {/* ── Showcase image ──────────────────────────────────────────── */}
+      {/* ↓ Replace Image src with Higgsfield-generated abstract AI visual */}
+      <section className="py-24 px-8">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+          <div className="order-2 lg:order-1">
+            <span className="text-[11px] font-mono font-semibold tracking-widest uppercase text-quantum-400 mb-4 block">
+              How it adapts
+            </span>
+            <h2 className="text-[2rem] font-display font-bold text-slate-900 leading-tight mb-5">
+              The engine that never stops learning
+            </h2>
+            <p className="text-slate-500 text-[15px] leading-relaxed mb-6">
+              Every click, scroll, and pause is a signal. Omega's personalization engine
+              processes these signals continuously, updating your interface profile as your
+              context shifts — between deep focus, collaborative review, and creative exploration.
+            </p>
+            <ul className="space-y-3">
+              {[
+                "Detects cognitive load from interaction velocity",
+                "Adjusts layout density without page reloads",
+                "Remembers preferences across sessions",
+                "Zero manual configuration required",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2.5 text-[14px] text-slate-600">
+                  <Check size={16} weight="bold" className="text-quantum-400 flex-shrink-0 mt-0.5" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 mt-8 text-[13px] font-semibold text-quantum-400 hover:text-quantum-500 transition-colors"
+            >
+              See it live <ArrowUpRight size={14} weight="bold" />
+            </Link>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {FEATURES.map((feature, i) => {
-            const styles = accentStyles[feature.accent as keyof typeof accentStyles];
-            const Icon = feature.icon;
-            return (
+          <div className="order-1 lg:order-2">
+            <div className="rounded-2xl overflow-hidden border border-slate-100 shadow-xl shadow-slate-200/50">
+              <Image
+                src={SHOWCASE_IMG}
+                alt="Omega AI neural adaptation — abstract visualization"
+                width={1200}
+                height={900}
+                className="w-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Features grid ───────────────────────────────────────────── */}
+      <section className="py-24 px-8 bg-slate-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-[11px] font-mono font-semibold tracking-widest uppercase text-quantum-400 mb-4 block">
+              Capabilities
+            </span>
+            <h2 className="text-[2rem] font-display font-bold text-slate-900 mb-4">
+              Every dimension, adapted by AI
+            </h2>
+            <p className="text-slate-400 text-[15px] max-w-xl mx-auto">
+              From micro-interactions to macro-layout — Omega operates across every
+              layer of your interface stack simultaneously.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {FEATURES.map((f, i) => (
               <div
-                key={feature.title}
+                key={f.title}
                 className={cn(
-                  "card-base p-5 group transition-all duration-300 animate-in",
-                  styles.glow,
-                  `stagger-${i + 1}`
+                  "bg-white rounded-xl p-6 border border-slate-100",
+                  "hover:border-slate-200 hover:shadow-md hover:shadow-slate-100",
+                  "transition-all duration-200 group"
                 )}
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div
-                    className={cn(
-                      "w-9 h-9 rounded-xl border flex items-center justify-center",
-                      styles.icon
-                    )}
-                  >
-                    <Icon className="w-4 h-4" />
+                  <div className="w-9 h-9 rounded-lg bg-quantum-400/8 border border-quantum-400/16 flex items-center justify-center">
+                    <f.Icon size={16} weight="duotone" className="text-quantum-400" />
                   </div>
-                  <span className={cn("badge border", styles.badge)}>
-                    {feature.tag}
+                  <span className="text-[10px] font-mono font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                    {f.tag}
                   </span>
                 </div>
-                <h3 className="text-sm font-display font-semibold text-white/90 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-xs text-white/35 leading-relaxed">
-                  {feature.description}
-                </p>
+                <h3 className="text-[13px] font-semibold text-slate-900 mb-2">{f.title}</h3>
+                <p className="text-[12px] text-slate-400 leading-relaxed">{f.description}</p>
               </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ── How it works ─────────────────────────────────── */}
-      <section className="relative z-10 py-24 px-8 max-w-4xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="section-label mb-3 block">Architecture</span>
-          <h2 className="text-3xl font-display font-bold text-white">
-            How AIPE works
-          </h2>
-        </div>
-        <div className="space-y-3">
-          {[
-            {
-              step: "01",
-              title: "Signal Capture",
-              desc: "Every interaction — click velocity, scroll depth, keyboard patterns, idle states — is captured as behavioral signals at 60hz.",
-              icon: Activity,
-              color: "quantum",
-            },
-            {
-              step: "02",
-              title: "AI Inference Pipeline",
-              desc: "Signals flow into the personalization engine, which infers cognitive load, emotional state, productivity mode, and interaction preferences.",
-              icon: Brain,
-              color: "neural",
-            },
-            {
-              step: "03",
-              title: "Interface Mutation",
-              desc: "When confidence exceeds threshold, the engine mutates CSS design tokens in real time — layout, density, colors, motion, typography.",
-              icon: Zap,
-              color: "synapse",
-            },
-            {
-              step: "04",
-              title: "Memory & Evolution",
-              desc: "Every adaptation is logged. The model improves its confidence across sessions, building a deeply personal interface fingerprint.",
-              icon: BarChart3,
-              color: "plasma",
-            },
-          ].map((step, i) => {
-            const Icon = step.icon;
-            return (
-              <div
-                key={step.step}
-                className={cn(
-                  "flex items-start gap-5 p-5 rounded-2xl",
-                  "border border-white/[0.06] bg-white/[0.02]",
-                  "hover:bg-white/[0.04] hover:border-white/10 transition-all duration-200",
-                  `animate-in stagger-${i + 1}`
-                )}
-              >
-                <div className="font-display font-bold text-3xl text-white/[0.07] font-numeric w-10 flex-shrink-0 mt-0.5">
-                  {step.step}
-                </div>
-                <div
-                  className={cn(
-                    "w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 border",
-                    step.color === "quantum" && "bg-quantum-400/10 border-quantum-400/20 text-quantum-400",
-                    step.color === "neural" && "bg-neural-400/10 border-neural-400/20 text-neural-400",
-                    step.color === "synapse" && "bg-synapse-400/10 border-synapse-400/20 text-synapse-400",
-                    step.color === "plasma" && "bg-plasma-500/10 border-plasma-500/20 text-plasma-500"
-                  )}
-                >
-                  <Icon className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-display font-semibold text-white/80 mb-1">
-                    {step.title}
-                  </h3>
-                  <p className="text-xs text-white/30 leading-relaxed">{step.desc}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ── CTA ──────────────────────────────────────────── */}
-      <section className="relative z-10 py-24 px-8 text-center">
-        <div className="max-w-2xl mx-auto">
-          <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-quantum-400/20 to-neural-400/20 border border-neural-400/20 flex items-center justify-center mx-auto mb-6">
-            <Brain className="w-8 h-8 text-neural-300" />
+            ))}
           </div>
-          <h2 className="text-3xl font-display font-bold text-white mb-4">
+        </div>
+      </section>
+
+      {/* ── How it works ────────────────────────────────────────────── */}
+      <section className="py-24 px-8">
+        <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+
+          {/* Left — steps */}
+          <div>
+            <span className="text-[11px] font-mono font-semibold tracking-widest uppercase text-quantum-400 mb-4 block">
+              Architecture
+            </span>
+            <h2 className="text-[2rem] font-display font-bold text-slate-900 mb-8 leading-tight">
+              How Omega works
+            </h2>
+            <div className="space-y-6">
+              {STEPS.map((step, i) => (
+                <div key={step.n} className="flex items-start gap-4">
+                  {/* Step number + connector */}
+                  <div className="flex flex-col items-center">
+                    <div className="w-8 h-8 rounded-full bg-quantum-400/10 border border-quantum-400/20 flex items-center justify-center flex-shrink-0">
+                      <span className="text-[11px] font-mono font-bold text-quantum-400">
+                        {step.n}
+                      </span>
+                    </div>
+                    {i < STEPS.length - 1 && (
+                      <div className="w-px flex-1 bg-slate-100 mt-2 min-h-[1.5rem]" />
+                    )}
+                  </div>
+                  <div className="pb-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <step.Icon size={14} weight="bold" className="text-quantum-400" />
+                      <h3 className="text-[13px] font-semibold text-slate-900">{step.title}</h3>
+                    </div>
+                    <p className="text-[12px] text-slate-400 leading-relaxed">{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right — editorial image */}
+          {/* ↓ Replace with Higgsfield-generated workspace / product image */}
+          <div className="rounded-2xl overflow-hidden border border-slate-100 shadow-xl shadow-slate-200/50">
+            <Image
+              src={WORK_IMG}
+              alt="Omega in use — adaptive interface for focused work"
+              width={1200}
+              height={1200}
+              className="w-full object-cover aspect-square"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ─────────────────────────────────────────────────────── */}
+      <section className="py-24 px-8 bg-slate-900">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="w-14 h-14 rounded-2xl bg-quantum-400 flex items-center justify-center mx-auto mb-6 shadow-quantum">
+            <span className="text-white font-display font-bold text-2xl leading-none">Ω</span>
+          </div>
+          <h2 className="text-[2rem] font-display font-bold text-white mb-4 leading-tight">
             Ready to let AI own your interface?
           </h2>
-          <p className="text-white/35 text-sm mb-8 leading-relaxed">
-            Open the platform and let AIPE spend the first few minutes learning
-            your patterns. Most users see their first adaptation within 90 seconds.
+          <p className="text-slate-400 text-[15px] mb-8 leading-relaxed">
+            Open Omega and let it spend the first few minutes learning your patterns.
+            Most users see their first adaptation within 90 seconds.
           </p>
-          <Link href="/dashboard" className="btn-primary text-base px-8 py-3.5 mx-auto">
-            <Sparkles className="w-4 h-4" />
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-quantum-400 hover:bg-quantum-300 text-white text-[14px] font-semibold transition-all duration-150 shadow-quantum-sm hover:shadow-quantum"
+          >
+            <Sparkle size={15} weight="fill" />
             Start Adapting
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight size={13} weight="bold" />
           </Link>
         </div>
       </section>
 
-      {/* ── Footer ───────────────────────────────────────── */}
-      <footer className="relative z-10 border-t border-white/[0.05] px-8 py-6 flex items-center justify-between">
+      {/* ── Footer ──────────────────────────────────────────────────── */}
+      <footer className="border-t border-slate-100 px-8 py-6 flex items-center justify-between bg-white">
         <div className="flex items-center gap-2">
-          <Brain className="w-3.5 h-3.5 text-white/20" />
-          <span className="text-xs font-mono text-white/20">
-            AIPE · AI Interface Personalization Engine · v0.1.0
+          <div className="w-5 h-5 rounded bg-quantum-400 flex items-center justify-center">
+            <span className="text-white font-display font-bold text-[10px] leading-none">Ω</span>
+          </div>
+          <span className="text-[12px] font-mono text-slate-400">
+            Omega · AI Interface Personalization Engine · v0.1.0
           </span>
         </div>
-        <span className="text-xs font-mono text-white/15">
+        <span className="text-[11px] font-mono text-slate-300">
           Built for the future of software interfaces
         </span>
       </footer>

@@ -30,11 +30,11 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "AIPE — AI Interface Personalization Engine",
-    template: "%s | AIPE",
+    default: "Omega — AI Interface Personalization Engine",
+    template: "%s | Omega",
   },
   description:
-    "An AI-native operating layer that dynamically reconstructs any digital interface based on your behavior, preferences, and emotional state.",
+    "Omega is an AI-native operating layer that dynamically reconstructs your interface based on behaviour, cognitive state, and emotional context.",
   keywords: ["AI", "interface personalization", "adaptive UI", "machine learning", "UX automation"],
   authors: [{ name: "AIPE" }],
   creator: "AIPE",

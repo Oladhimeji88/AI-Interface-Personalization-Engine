@@ -75,7 +75,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "AIPE",      href: "/" },
+      { label: "Omega",     href: "/" },
       { label: "Dashboard", href: "/dashboard" },
     ]);
   }, [setBreadcrumbs]);

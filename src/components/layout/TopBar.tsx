@@ -43,7 +43,7 @@ export function TopBar() {
           <div className="flex items-center gap-2">
             <span className="live-dot" />
             <span className="text-[12px] font-mono text-white/22 tracking-wide">
-              aipe.interface · active
+              omega.interface · active
             </span>
           </div>
         )}

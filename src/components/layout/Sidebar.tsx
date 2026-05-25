@@ -80,13 +80,13 @@ export function Sidebar() {
         )}
       >
         <div className={cn("flex items-center gap-3", sidebarCollapsed && "justify-center")}>
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-quantum-400 to-neural-500 flex items-center justify-center flex-shrink-0 shadow-quantum-sm">
-            <Brain size={16} weight="fill" className="text-white" />
+          <div className="w-8 h-8 rounded-lg bg-quantum-400 flex items-center justify-center flex-shrink-0 shadow-quantum-sm">
+            <span className="text-white font-display font-bold text-base leading-none">Ω</span>
           </div>
           {!sidebarCollapsed && (
             <div>
               <div className="text-[13px] font-display font-bold text-white leading-tight tracking-tight">
-                AIPE
+                Omega
               </div>
               <div className="text-[10px] font-mono text-white/22 leading-tight">
                 v0.1 · beta

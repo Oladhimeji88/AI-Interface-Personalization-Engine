@@ -1,6 +1,6 @@
-# AIPE — AI Interface Personalization Engine
+# Omega — AI Interface Personalization Engine
 
-An AI-native operating layer that dynamically reconstructs its own interface based on your behavior, cognitive load, emotional state, and productivity patterns — in real time.
+An AI-native operating layer that dynamically reconstructs its own interface based on your behaviour, cognitive load, emotional state, and productivity patterns — in real time.
 
 ---
 
