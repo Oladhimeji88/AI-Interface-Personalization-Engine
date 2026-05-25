@@ -6,7 +6,7 @@ An AI-native operating layer that dynamically reconstructs its own interface bas
 
 ## Overview
 
-AIPE observes how you interact with a digital interface (click cadence, keyboard patterns, scroll depth, session duration) and continuously mutates CSS design tokens, layout density, motion preferences, and typography to match your current state. No manual configuration required.
+Omega observes how you interact with a digital interface (click cadence, keyboard patterns, scroll depth, session duration) and continuously mutates CSS design tokens, layout density, motion preferences, and typography to match your current state. No manual configuration required.
 
 The core idea: the interface should adapt to the user, not the other way around.
 
@@ -15,7 +15,7 @@ The core idea: the interface should adapt to the user, not the other way around.
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
+| --- | --- |
 | Framework | Next.js 14 (App Router) |
 | Language | TypeScript 5 |
 | Styling | Tailwind CSS 3 + CSS custom properties |
@@ -33,7 +33,7 @@ The core idea: the interface should adapt to the user, not the other way around.
 ### 60 : 30 : 10 Colour Rule
 
 | Role | Share | Colour | Usage |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Ink** (Foundation) | 60% | `void.*` `#080913` base | All backgrounds — page, sidebar, header, cards |
 | **Slate** (Structure) | 30% | White/alpha surfaces · `#94A3B8` text | Borders, dividers, secondary text, surface lifts |
 | **Quantum** (Accent) | 10% | `#4F80FF` blue | Buttons, links, active states, focus rings |
@@ -41,7 +41,7 @@ The core idea: the interface should adapt to the user, not the other way around.
 Additional semantic accents used sparingly:
 
 | Name | Hex | Role |
-|---|---|---|
+| --- | --- | --- |
 | Neural | `#A78BFA` | AI-specific features, recommendations |
 | Synapse | `#34D399` | Success, live indicators |
 | Plasma | `#F59E0B` | Warnings, cognitive load charts |
@@ -56,7 +56,7 @@ Tailwind shorthand: `p-2` `p-4` `p-6` `p-8` `p-10` `p-12` `p-16`
 ### Typography
 
 | Font | Variable | Use |
-|---|---|---|
+| --- | --- | --- |
 | Inter | `--font-inter` | All body and UI text (default `font-sans`) |
 | Syne | `--font-syne` | Display / hero headings (`font-display`) |
 | JetBrains Mono | `--font-mono` | Code, metrics, badges, chart axes |
@@ -64,7 +64,7 @@ Tailwind shorthand: `p-2` `p-4` `p-6` `p-8` `p-10` `p-12` `p-16`
 ### Icon Weights (Phosphor)
 
 | Weight | When to use |
-|---|---|
+| --- | --- |
 | `regular` | Default functional icons |
 | `bold` | Active / selected state |
 | `fill` | Status indicators, solid on/off states |
@@ -77,7 +77,7 @@ Tailwind shorthand: `p-2` `p-4` `p-6` `p-8` `p-10` `p-12` `p-16`
 ```
 src/
 ├── app/
-│   ├── page.tsx                    # Landing page
+│   ├── page.tsx                    # Landing page (light mode, Omega brand)
 │   ├── layout.tsx                  # Root layout — font loading, AIProvider
 │   ├── globals.css                 # Design tokens, utility classes
 │   └── (dashboard)/
@@ -178,7 +178,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Key Keyboard Shortcuts
 
 | Shortcut | Action |
-|---|---|
+| --- | --- |
 | `⌘K` | Open command palette |
 | `⌘⇧F` | Toggle focus mode |
 
@@ -187,7 +187,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Utility Classes (globals.css)
 
 | Class | Description |
-|---|---|
+| --- | --- |
 | `.card-base` | Standard card surface with 3-layer elevation shadow |
 | `.btn-primary` | Quantum-blue filled button |
 | `.btn-secondary` | Glass-effect button |
@@ -206,9 +206,28 @@ Open [http://localhost:3000](http://localhost:3000).
 Configurable in **Settings → AI Engine** and **Personalize → AI Engine**:
 
 | Setting | Default | Description |
-|---|---|---|
+| --- | --- | --- |
 | Response Speed | 75 | How quickly the AI reacts to new signals |
 | Confidence Threshold | 65 | Minimum confidence before applying an adaptation |
+
+---
+
+## Replacing Placeholder Images
+
+The landing page uses Unsplash images as placeholders. To replace them with custom Higgsfield-generated visuals, update the three constants at the top of `src/app/page.tsx`:
+
+```ts
+// Hero browser mockup
+const HERO_IMG = "/images/hero.jpg";
+
+// Abstract AI showcase section
+const SHOWCASE_IMG = "/images/showcase.jpg";
+
+// How it works editorial shot
+const WORK_IMG = "/images/workflow.jpg";
+```
+
+Place generated images in `public/images/`. Suggested Higgsfield prompts are included as comments in the source file.
 
 ---
 
