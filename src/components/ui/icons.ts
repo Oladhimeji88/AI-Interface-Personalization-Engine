@@ -47,6 +47,7 @@ export {
   TrendUp,         // Positive delta
   TrendDown,       // Negative delta
   Minus,           // Neutral / flat
+  ArrowRight,      // Forward navigation / CTA
   ArrowUpRight,    // External link / expand
 
   // ── Interface tokens ──────────────────────────────────────

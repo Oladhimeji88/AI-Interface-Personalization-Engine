@@ -1,3 +1,8 @@
 {
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/(dashboard)/personalize/page": "app/(dashboard)/personalize/page.js",
+  "/(dashboard)/themes/page": "app/(dashboard)/themes/page.js",
+  "/(dashboard)/dashboard/page": "app/(dashboard)/dashboard/page.js",
+  "/(dashboard)/insights/page": "app/(dashboard)/insights/page.js",
+  "/(dashboard)/editor/page": "app/(dashboard)/editor/page.js"
 }

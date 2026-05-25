@@ -1,22 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Syne, JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { AIProvider } from "@/providers/AIProvider";
 import "./globals.css";
 
-// Inter — the gold standard for professional tech UIs
-// Used by Figma, Linear, Vercel, Stripe, GitHub, Notion
-const inter = Inter({
+// Plus Jakarta Sans — primary UI and display font
+const jakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-// Syne — display-only for hero headings
-const syne = Syne({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  variable: "--font-syne",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
   display: "swap",
 });
 
@@ -51,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${syne.variable} ${jetbrainsMono.variable} dark`}
+      className={`${jakartaSans.variable} ${jetbrainsMono.variable} dark`}
     >
       <body className="antialiased">
         <AIProvider>{children}</AIProvider>
