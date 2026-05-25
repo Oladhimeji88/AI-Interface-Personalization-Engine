@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { CommandPalette } from "@/components/ui/CommandPalette";
+import { ToastRenderer } from "@/components/ui/ToastRenderer";
 import { useUIStore } from "@/lib/store/ui.store";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +53,7 @@ export default function DashboardLayout({
       </main>
 
       <CommandPalette />
+      <ToastRenderer />
     </div>
   );
 }

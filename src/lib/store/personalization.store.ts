@@ -7,6 +7,12 @@ import type {
   BehaviorSignal,
 } from "@/types/personalization";
 import { PersonalizationEngine } from "@/lib/ai/personalization-engine";
+import { useUIStore } from "@/lib/store/ui.store";
+
+interface AISettings {
+  responseSpeed: number;
+  confidenceThreshold: number;
+}
 
 interface PersonalizationState {
   // Profile
@@ -23,6 +29,9 @@ interface PersonalizationState {
   adaptationHistory: AdaptationDelta[];
   signalQueue: BehaviorSignal[];
 
+  // AI Settings
+  aiSettings: AISettings;
+
   // UI State
   isPanelOpen: boolean;
   activeSection:
@@ -38,9 +47,7 @@ interface PersonalizationState {
 
   // Actions
   initProfile: (userId: string) => void;
-  updateProfile: (
-    updates: Partial<PersonalizationProfile>
-  ) => void;
+  updateProfile: (updates: Partial<PersonalizationProfile>) => void;
   adaptProfile: () => Promise<void>;
   pushSignal: (signal: BehaviorSignal) => void;
   applyRecommendation: (id: string) => void;
@@ -48,6 +55,8 @@ interface PersonalizationState {
   setPanel: (open: boolean, section?: PersonalizationState["activeSection"]) => void;
   setPreviewMode: (enabled: boolean, profile?: PersonalizationProfile) => void;
   resetToDefaults: () => void;
+  clearHistory: () => void;
+  updateAISettings: (updates: Partial<AISettings>) => void;
 }
 
 export const usePersonalizationStore = create<PersonalizationState>()(
@@ -62,6 +71,7 @@ export const usePersonalizationStore = create<PersonalizationState>()(
         dismissedRecommendations: [],
         adaptationHistory: [],
         signalQueue: [],
+        aiSettings: { responseSpeed: 75, confidenceThreshold: 65 },
         isPanelOpen: false,
         activeSection: null,
         previewMode: false,
@@ -109,8 +119,23 @@ export const usePersonalizationStore = create<PersonalizationState>()(
               signalQueue: [],
               isAdapting: false,
             });
+
+            if (deltas.length > 0) {
+              useUIStore.getState().addToast({
+                type: "ai",
+                title: `${deltas.length} adaptation${deltas.length !== 1 ? "s" : ""} applied`,
+                description: deltas[0]?.reason ?? "Interface updated to match your patterns",
+                duration: 4500,
+              });
+            }
           } catch {
             set({ isAdapting: false, lastError: "Adaptation failed — retrying shortly" });
+            useUIStore.getState().addToast({
+              type: "error",
+              title: "Adaptation failed",
+              description: "Could not apply interface changes. Will retry shortly.",
+              duration: 4000,
+            });
           }
         },
 
@@ -135,6 +160,12 @@ export const usePersonalizationStore = create<PersonalizationState>()(
               r.id === id ? { ...r, applied: true } : r
             ),
           });
+          useUIStore.getState().addToast({
+            type: "ai",
+            title: rec.title,
+            description: "Recommendation applied to your interface",
+            duration: 3500,
+          });
         },
 
         dismissRecommendation: (id) => {
@@ -158,7 +189,27 @@ export const usePersonalizationStore = create<PersonalizationState>()(
           if (profile) {
             const defaults = PersonalizationEngine.createDefaultProfile(profile.userId);
             set({ profile: defaults, adaptationHistory: [], recommendations: [] });
+            useUIStore.getState().addToast({
+              type: "info",
+              title: "Profile reset",
+              description: "Interface restored to default settings",
+              duration: 3000,
+            });
           }
+        },
+
+        clearHistory: () => {
+          set({ adaptationHistory: [] });
+          useUIStore.getState().addToast({
+            type: "success",
+            title: "History cleared",
+            description: "Adaptation history has been erased",
+            duration: 2500,
+          });
+        },
+
+        updateAISettings: (updates) => {
+          set((s) => ({ aiSettings: { ...s.aiSettings, ...updates } }));
         },
       })),
       {
@@ -167,6 +218,7 @@ export const usePersonalizationStore = create<PersonalizationState>()(
           profile: state.profile,
           dismissedRecommendations: state.dismissedRecommendations,
           adaptationHistory: state.adaptationHistory.slice(0, 20),
+          aiSettings: state.aiSettings,
         }),
       }
     )
