@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist, subscribeWithSelector } from "zustand/middleware";
-import { immer } from "zustand/middleware/immer";
 import type {
   PersonalizationProfile,
   AIRecommendation,
@@ -54,7 +53,7 @@ interface PersonalizationState {
 export const usePersonalizationStore = create<PersonalizationState>()(
   subscribeWithSelector(
     persist(
-      immer((set, get) => ({
+      ((set, get) => ({
         profile: null,
         isLoading: false,
         isAdapting: false,
@@ -69,38 +68,29 @@ export const usePersonalizationStore = create<PersonalizationState>()(
         previewProfile: null,
 
         initProfile: (userId: string) => {
-          set((state) => {
-            if (!state.profile) {
-              state.profile = PersonalizationEngine.createDefaultProfile(userId);
-              state.isLoading = false;
-            }
-          });
+          const s = get();
+          if (!s.profile) {
+            set({ profile: PersonalizationEngine.createDefaultProfile(userId), isLoading: false });
+          }
         },
 
         updateProfile: (updates) => {
-          set((state) => {
-            if (state.profile) {
-              Object.assign(state.profile, updates);
-              state.profile.updatedAt = new Date();
-            }
-          });
+          const { profile } = get();
+          if (profile) {
+            set({ profile: { ...profile, ...updates, updatedAt: new Date() } });
+          }
         },
 
         adaptProfile: async () => {
           const { profile, signalQueue } = get();
           if (!profile || signalQueue.length < 5) return;
 
-          set((state) => {
-            state.isAdapting = true;
-          });
+          set({ isAdapting: true });
 
           try {
-            // Simulate async AI inference (replace with actual API call)
             await new Promise((r) => setTimeout(r, 800));
 
-            const mockBehaviorProfile = createMockBehaviorProfile(
-              profile.userId
-            );
+            const mockBehaviorProfile = createMockBehaviorProfile(profile.userId);
             const { profile: newProfile, deltas, recommendations } =
               await PersonalizationEngine.adaptProfile(
                 profile,
@@ -108,86 +98,67 @@ export const usePersonalizationStore = create<PersonalizationState>()(
                 signalQueue
               );
 
-            set((state) => {
-              state.profile = newProfile;
-              state.adaptationHistory = [
-                ...deltas,
-                ...state.adaptationHistory,
-              ].slice(0, 100);
-              state.recommendations = [
-                ...recommendations.filter(
-                  (r) => !state.dismissedRecommendations.includes(r.id)
-                ),
-                ...state.recommendations,
-              ].slice(0, 10);
-              state.signalQueue = [];
-              state.isAdapting = false;
+            const { adaptationHistory, dismissedRecommendations, recommendations: existingRecs } = get();
+            set({
+              profile: newProfile,
+              adaptationHistory: [...deltas, ...adaptationHistory].slice(0, 100),
+              recommendations: [
+                ...recommendations.filter((r) => !dismissedRecommendations.includes(r.id)),
+                ...existingRecs,
+              ].slice(0, 10),
+              signalQueue: [],
+              isAdapting: false,
             });
-          } catch (err) {
-            set((state) => {
-              state.isAdapting = false;
-              state.lastError = "Adaptation failed — retrying shortly";
-            });
+          } catch {
+            set({ isAdapting: false, lastError: "Adaptation failed — retrying shortly" });
           }
         },
 
         pushSignal: (signal) => {
-          set((state) => {
-            state.signalQueue = [...state.signalQueue, signal].slice(-200);
-          });
-
-          // Auto-trigger adaptation when enough signals accumulate
-          const { signalQueue, adaptProfile } = get();
-          if (signalQueue.length >= 30) {
-            adaptProfile();
+          const { signalQueue } = get();
+          const updated = [...signalQueue, signal].slice(-200);
+          set({ signalQueue: updated });
+          if (updated.length >= 30) {
+            get().adaptProfile();
           }
         },
 
         applyRecommendation: (id) => {
-          set((state) => {
-            const rec = state.recommendations.find((r) => r.id === id);
-            if (rec && state.profile) {
-              rec.applied = true;
-              // Apply the recommendation to the profile
-              applyRecommendationToProfile(state.profile, rec);
-            }
+          const { recommendations, profile } = get();
+          if (!profile) return;
+          const rec = recommendations.find((r) => r.id === id);
+          if (!rec) return;
+          const updatedProfile = applyRecommendationToProfile(profile, rec);
+          set({
+            profile: updatedProfile,
+            recommendations: recommendations.map((r) =>
+              r.id === id ? { ...r, applied: true } : r
+            ),
           });
         },
 
         dismissRecommendation: (id) => {
-          set((state) => {
-            state.dismissedRecommendations.push(id);
-            state.recommendations = state.recommendations.filter(
-              (r) => r.id !== id
-            );
+          const { dismissedRecommendations, recommendations } = get();
+          set({
+            dismissedRecommendations: [...dismissedRecommendations, id],
+            recommendations: recommendations.filter((r) => r.id !== id),
           });
         },
 
         setPanel: (open, section = null) => {
-          set((state) => {
-            state.isPanelOpen = open;
-            state.activeSection = section;
-          });
+          set({ isPanelOpen: open, activeSection: section });
         },
 
         setPreviewMode: (enabled, previewProfile) => {
-          set((state) => {
-            state.previewMode = enabled;
-            state.previewProfile = previewProfile ?? null;
-          });
+          set({ previewMode: enabled, previewProfile: previewProfile ?? null });
         },
 
         resetToDefaults: () => {
-          set((state) => {
-            if (state.profile) {
-              const defaults = PersonalizationEngine.createDefaultProfile(
-                state.profile.userId
-              );
-              state.profile = defaults;
-              state.adaptationHistory = [];
-              state.recommendations = [];
-            }
-          });
+          const { profile } = get();
+          if (profile) {
+            const defaults = PersonalizationEngine.createDefaultProfile(profile.userId);
+            set({ profile: defaults, adaptationHistory: [], recommendations: [] });
+          }
         },
       })),
       {
@@ -207,18 +178,20 @@ export const usePersonalizationStore = create<PersonalizationState>()(
 function applyRecommendationToProfile(
   profile: PersonalizationProfile,
   rec: AIRecommendation
-): void {
+): PersonalizationProfile {
+  const updated = structuredClone(profile);
   switch (rec.type) {
     case "density":
-      profile.layout.density = "compact";
+      updated.layout.density = "compact";
       break;
     case "motion":
-      profile.motion.preference = "reduced";
+      updated.motion.preference = "reduced";
       break;
     case "navigation":
-      profile.accessibility.keyboardNavigation = "enhanced";
+      updated.accessibility.keyboardNavigation = "enhanced";
       break;
   }
+  return updated;
 }
 
 function createMockBehaviorProfile(userId: string) {
