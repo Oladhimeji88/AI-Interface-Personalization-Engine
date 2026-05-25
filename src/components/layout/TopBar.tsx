@@ -7,8 +7,7 @@ import { AIStatusBadge } from "@/components/ui/AIStatusBadge";
 import { cn } from "@/lib/utils";
 
 export function TopBar() {
-  const { breadcrumbs, notificationCount, openCommandPalette, focusMode } =
-    useUIStore();
+  const { breadcrumbs, notificationCount, openCommandPalette, focusMode } = useUIStore();
   const { profile } = usePersonalizationStore();
 
   return (
@@ -17,25 +16,22 @@ export function TopBar() {
         "fixed top-0 right-0 z-30 h-[var(--header-height)]",
         "left-[var(--sidebar-width)]",
         "flex items-center justify-between px-6",
-        "border-b border-white/[0.06] bg-void-DEFAULT/80 backdrop-blur-xl",
+        "border-b border-white/[0.055]",
+        "bg-void-DEFAULT/88 backdrop-blur-xl",
         "transition-all duration-300 ease-spring",
         focusMode && "opacity-0 pointer-events-none"
       )}
     >
-      {/* Breadcrumbs */}
-      <div className="flex items-center gap-1.5">
+      {/* ── Breadcrumbs ───────────────────────────────────────────────── */}
+      <div className="flex items-center gap-1">
         {breadcrumbs.length > 0 ? (
           breadcrumbs.map((crumb, i) => (
-            <div key={crumb.href} className="flex items-center gap-1.5">
-              {i > 0 && (
-                <ChevronRight className="w-3 h-3 text-white/15" />
-              )}
+            <div key={crumb.href} className="flex items-center gap-1">
+              {i > 0 && <ChevronRight className="w-3 h-3 text-white/15" />}
               <span
                 className={cn(
-                  "text-sm font-medium",
-                  i === breadcrumbs.length - 1
-                    ? "text-white/80"
-                    : "text-white/30"
+                  "text-[13px] font-medium",
+                  i === breadcrumbs.length - 1 ? "text-white/78" : "text-white/28"
                 )}
               >
                 {crumb.label}
@@ -44,46 +40,48 @@ export function TopBar() {
           ))
         ) : (
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-synapse-400 animate-pulse" />
-            <span className="text-sm font-mono text-white/25">
-              aipe.interface — active
+            <span className="live-dot" />
+            <span className="text-[12px] font-mono text-white/22 tracking-wide">
+              aipe.interface · active
             </span>
           </div>
         )}
       </div>
 
-      {/* Right actions */}
+      {/* ── Right Actions ─────────────────────────────────────────────── */}
       <div className="flex items-center gap-2">
-        {/* AI adaptation indicator */}
+        {/* Live AI status */}
         <AIStatusBadge size="sm" showLabel={false} />
 
-        {/* Search */}
+        {/* Search / command shortcut */}
         <button
+          type="button"
           onClick={openCommandPalette}
           className={cn(
             "flex items-center gap-2 px-3 py-1.5 rounded-lg",
-            "glass border border-white/[0.07]",
-            "text-xs text-white/30 hover:text-white/60",
-            "transition-all duration-150 font-mono"
+            "bg-white/[0.04] border border-white/[0.07]",
+            "text-[12px] font-mono text-white/28 hover:text-white/55",
+            "hover:bg-white/[0.06] hover:border-white/[0.10]",
+            "transition-all duration-150"
           )}
         >
           <Search className="w-3.5 h-3.5" />
           <span className="hidden sm:block">Search…</span>
-          <span className="hidden sm:flex items-center gap-0.5 ml-1">
-            <kbd className="px-1 py-0.5 rounded bg-white/5 border border-white/[0.07] text-[10px]">⌘K</kbd>
-          </span>
+          <kbd className="hidden sm:block px-1.5 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-[10px] leading-none ml-1">
+            ⌘K
+          </kbd>
         </button>
 
-        {/* AI Adapt trigger */}
+        {/* Adapt trigger */}
         <button
-          onClick={() =>
-            usePersonalizationStore.getState().adaptProfile()
-          }
+          type="button"
+          onClick={() => usePersonalizationStore.getState().adaptProfile()}
           className={cn(
             "flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
-            "bg-neural-400/10 border border-neural-400/20",
-            "text-xs font-mono font-medium text-neural-300",
-            "hover:bg-neural-400/20 transition-all duration-150"
+            "bg-quantum-400/10 border border-quantum-400/[0.18]",
+            "text-[12px] font-mono font-medium text-quantum-300",
+            "hover:bg-quantum-400/[0.18] hover:border-quantum-400/[0.28]",
+            "transition-all duration-150"
           )}
         >
           <Zap className="w-3 h-3" />
@@ -91,10 +89,14 @@ export function TopBar() {
         </button>
 
         {/* Notifications */}
-        <button className="relative w-8 h-8 rounded-lg flex items-center justify-center glass border border-white/[0.07] hover:bg-white/[0.08] transition-all duration-150">
-          <Bell className="w-3.5 h-3.5 text-white/50" />
+        <button
+          type="button"
+          aria-label={`${notificationCount} notifications`}
+          className="relative w-8 h-8 rounded-lg flex items-center justify-center bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07] hover:border-white/[0.10] transition-all duration-150"
+        >
+          <Bell className="w-3.5 h-3.5 text-white/45" />
           {notificationCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-neural-400 text-white text-[9px] font-bold font-mono flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-neural-500 text-white text-[9px] font-bold font-mono flex items-center justify-center">
               {notificationCount}
             </span>
           )}
