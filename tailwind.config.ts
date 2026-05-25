@@ -10,12 +10,12 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        // Plus Jakarta Sans — primary UI font
-        sans: ["var(--font-jakarta)", "system-ui", "sans-serif"],
-        body: ["var(--font-jakarta)", "system-ui", "sans-serif"],
+        // Inter — primary UI font (screen-optimised, industry standard)
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        body: ["var(--font-inter)", "system-ui", "sans-serif"],
         // Syne — display/hero headings only
         display: ["var(--font-syne)", "sans-serif"],
-        // JetBrains Mono — code, metrics, labels
+        // JetBrains Mono — code, metrics, labels, chart axes
         mono: ["var(--font-mono)", "monospace"],
       },
       colors: {

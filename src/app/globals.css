@@ -8,8 +8,8 @@
    Typeface      →  Plus Jakarta Sans (UI) · Syne (display) · JetBrains Mono (code)
    ──────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Typeface */
-  --font-jakarta: "Plus Jakarta Sans", system-ui, sans-serif;
+  /* Typeface — Inter (gold standard for tech UIs) + Syne display + JetBrains Mono */
+  --font-inter: "Inter", system-ui, sans-serif;
   --font-syne: "Syne", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
@@ -87,12 +87,12 @@ html {
 }
 
 body {
-  font-family: var(--font-jakarta);
+  font-family: var(--font-inter);
   font-size: var(--text-base);
   background-color: var(--color-background);
   color: var(--color-text);
   line-height: 1.6;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11"; /* Jakarta Sans OpenType features */
+  font-feature-settings: "cv01", "cv02", "cv03", "cv04", "ss01"; /* Inter OpenType refinements */
   overflow-x: hidden;
   transition:
     background-color var(--duration-slow) var(--ease-spring),
