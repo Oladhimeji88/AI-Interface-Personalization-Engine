@@ -2,28 +2,21 @@
 
 import { useEffect } from "react";
 import { useUIStore } from "@/lib/store/ui.store";
-import { cn } from "@/lib/utils";
-import {
-  Lightbulb,
-  Brain,
-  TrendingUp,
-  Clock,
-  Zap,
-  Eye,
-  Activity,
-  ChevronRight,
-  Sparkles,
-} from "lucide-react";
+import { Stack, Box, Inline, Grid, Text } from "@atlaskit/primitives";
+import Heading from "@atlaskit/heading";
+import Lozenge from "@atlaskit/lozenge";
+import SectionMessage from "@atlaskit/section-message";
+import { Brain, TrendingUp, Zap, Eye, Activity, Sparkles } from "lucide-react";
+import styles from "./page.module.css";
 
 const INSIGHT_CARDS = [
   {
     category: "Productivity Pattern",
     title: "You enter deep work at 9–11am",
-    description:
-      "Your keyboard usage spikes 340% and error rate drops to near-zero during these hours. AIPE now pre-configures compact density and muted notifications automatically at 8:55am.",
-    impact: "high",
+    description: "Your keyboard usage spikes 340% and error rate drops to near-zero during these hours. AIPE now pre-configures compact density and muted notifications automatically at 8:55am.",
+    impact: "high" as const,
     icon: Brain,
-    color: "quantum",
+    color: "quantum" as const,
     stat: "340%",
     statLabel: "keyboard spike",
     actionable: "Schedule deep work blocks to capitalize on this window.",
@@ -31,11 +24,10 @@ const INSIGHT_CARDS = [
   {
     category: "Fatigue Signal",
     title: "Cognitive load peaks after 90-min sessions",
-    description:
-      "Error rate increases 2.3x and click velocity drops by 40% after extended sessions without breaks. Interface complexity is automatically reduced when this threshold is crossed.",
-    impact: "high",
+    description: "Error rate increases 2.3x and click velocity drops by 40% after extended sessions without breaks. Interface complexity is automatically reduced when this threshold is crossed.",
+    impact: "high" as const,
     icon: Activity,
-    color: "plasma",
+    color: "plasma" as const,
     stat: "2.3×",
     statLabel: "error increase",
     actionable: "Consider a 5-minute break trigger after 90 minutes.",
@@ -43,11 +35,10 @@ const INSIGHT_CARDS = [
   {
     category: "Power User Signal",
     title: "You rely heavily on keyboard navigation",
-    description:
-      "74% of your navigation events come from keyboard shortcuts rather than mouse clicks. You're in the top 8% of keyboard-first users. AIPE has elevated your shortcut suggestions.",
-    impact: "medium",
+    description: "74% of your navigation events come from keyboard shortcuts rather than mouse clicks. You're in the top 8% of keyboard-first users. AIPE has elevated your shortcut suggestions.",
+    impact: "medium" as const,
     icon: Zap,
-    color: "synapse",
+    color: "synapse" as const,
     stat: "74%",
     statLabel: "keyboard nav",
     actionable: "Enable chord shortcuts for your most-used flows.",
@@ -55,11 +46,10 @@ const INSIGHT_CARDS = [
   {
     category: "Attention Pattern",
     title: "Dashboard widgets — bottom-right ignored",
-    description:
-      "Attention heatmap analysis shows zero dwell time on bottom-right widgets for 14+ sessions. AIPE will propose a layout reorganization to move high-value content into your attention zone.",
-    impact: "medium",
+    description: "Attention heatmap analysis shows zero dwell time on bottom-right widgets for 14+ sessions. AIPE will propose a layout reorganization to move high-value content into your attention zone.",
+    impact: "medium" as const,
     icon: Eye,
-    color: "neural",
+    color: "neural" as const,
     stat: "14",
     statLabel: "sessions ignored",
     actionable: "Reorganize layout to surface high-value content.",
@@ -67,29 +57,35 @@ const INSIGHT_CARDS = [
   {
     category: "Session Pattern",
     title: "You start exploratory, shift to focused",
-    description:
-      "The first 15 minutes of each session shows wide navigation (5+ sections). After that, you settle into 1–2 focused areas. AIPE now delays sidebar collapse to support early exploration.",
-    impact: "low",
+    description: "The first 15 minutes of each session shows wide navigation (5+ sections). After that, you settle into 1–2 focused areas. AIPE now delays sidebar collapse to support early exploration.",
+    impact: "low" as const,
     icon: TrendingUp,
-    color: "quantum",
+    color: "quantum" as const,
     stat: "15m",
     statLabel: "exploration phase",
     actionable: "Breadcrumb navigation is temporarily expanded during this window.",
   },
 ];
 
-const impactColors = {
-  high: "text-plasma-400 bg-plasma-500/10 border-plasma-500/20",
-  medium: "text-neural-300 bg-neural-400/10 border-neural-400/20",
-  low: "text-synapse-300 bg-synapse-400/10 border-synapse-400/20",
+const impactAppearance: Record<string, "removed" | "moved" | "inprogress"> = {
+  high:   "removed",
+  medium: "moved",
+  low:    "inprogress",
 };
 
-const featureColors = {
-  quantum: "text-quantum-400 bg-quantum-400/10 border-quantum-400/20",
-  neural: "text-neural-400 bg-neural-400/10 border-neural-400/20",
-  synapse: "text-synapse-400 bg-synapse-400/10 border-synapse-400/20",
-  plasma: "text-plasma-500 bg-plasma-500/10 border-plasma-500/20",
-} as const;
+const iconClassMap: Record<string, string> = {
+  quantum: styles.iconQuantum,
+  neural:  styles.iconNeural,
+  synapse: styles.iconSynapse,
+  plasma:  styles.iconPlasma,
+};
+
+const statClassMap: Record<string, string> = {
+  quantum: styles.statValueQuantum,
+  neural:  styles.statValueNeural,
+  synapse: styles.statValueSynapse,
+  plasma:  styles.statValuePlasma,
+};
 
 export default function InsightsPage() {
   const { setBreadcrumbs } = useUIStore();
@@ -102,134 +98,100 @@ export default function InsightsPage() {
   }, [setBreadcrumbs]);
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
-      {/* Header */}
-      <div className="animate-in stagger-1">
-        <div className="flex items-center gap-2 mb-2">
-          <Lightbulb className="w-4 h-4 text-plasma-500" />
-          <span className="section-label">AI-Generated Insights</span>
-        </div>
-        <h1 className="text-2xl font-display font-bold text-white mb-1">
-          Behavior Insights
-        </h1>
-        <p className="text-sm text-white/35 max-w-lg">
-          AIPE has detected {INSIGHT_CARDS.length} behavioral patterns across your
-          sessions. These insights drive real-time interface adaptations.
-        </p>
-      </div>
+    <Box padding="space.400">
+      <Stack space="space.400">
 
-      {/* Summary stats */}
-      <div className="grid grid-cols-3 gap-4 animate-in stagger-2">
-        {[
-          { label: "Patterns Detected", value: "5", color: "quantum" },
-          { label: "High Impact", value: "2", color: "plasma" },
-          { label: "Applied Adaptations", value: "14", color: "synapse" },
-        ].map((s) => (
-          <div key={s.label} className="card-base p-4 text-center">
-            <div
-              className={cn(
-                "text-3xl font-display font-bold mb-1",
-                s.color === "quantum" && "text-quantum-400",
-                s.color === "plasma" && "text-plasma-400",
-                s.color === "synapse" && "text-synapse-400"
-              )}
-            >
-              {s.value}
-            </div>
-            <div className="text-xs font-mono text-white/30">{s.label}</div>
-          </div>
-        ))}
-      </div>
+        {/* ── Header ──────────────────────────────────────── */}
+        <Stack space="space.150">
+          <Inline space="space.100" alignBlock="center">
+            <Lozenge appearance="moved" isBold>AI-Generated</Lozenge>
+          </Inline>
+          <Heading size="xlarge">Behavior Insights</Heading>
+          <Text color="color.text.subtle">
+            AIPE has detected {INSIGHT_CARDS.length} behavioral patterns across your sessions.
+            These insights drive real-time interface adaptations.
+          </Text>
+        </Stack>
 
-      {/* Insight cards */}
-      <div className="space-y-4">
-        {INSIGHT_CARDS.map((insight, i) => {
-          const Icon = insight.icon;
-          const colorClass = featureColors[insight.color as keyof typeof featureColors];
-          return (
-            <div
-              key={insight.title}
-              className={cn(
-                "card-base p-5 group transition-all duration-300",
-                `animate-in stagger-${i + 1}`
-              )}
-            >
-              <div className="flex items-start gap-4">
-                {/* Stat display */}
-                <div className="flex-shrink-0 text-right min-w-16">
-                  <div
-                    className={cn(
-                      "text-2xl font-display font-bold tabular-nums leading-tight",
-                      colorClass.split(" ")[0]
-                    )}
-                  >
-                    {insight.stat}
+        {/* ── Summary stats ───────────────────────────────── */}
+        <Grid templateColumns="repeat(3, 1fr)" gap="space.200">
+          {[
+            { label: "Patterns Detected",   value: "5",  colorClass: styles.statValueQuantum },
+            { label: "High Impact",          value: "2",  colorClass: styles.statValuePlasma  },
+            { label: "Applied Adaptations",  value: "14", colorClass: styles.statValueSynapse },
+          ].map(({ label, value, colorClass }) => (
+            <Box key={label} backgroundColor="elevation.surface.raised" padding="space.300" borderRadius="border.radius">
+              <Stack space="space.050" alignInline="center">
+                <span className={colorClass}>{value}</span>
+                <Text size="small" color="color.text.subtlest" align="center">{label}</Text>
+              </Stack>
+            </Box>
+          ))}
+        </Grid>
+
+        {/* ── Insight cards ───────────────────────────────── */}
+        <Stack space="space.200">
+          {INSIGHT_CARDS.map((insight) => {
+            const Icon = insight.icon;
+            return (
+              <Box
+                key={insight.title}
+                backgroundColor="elevation.surface.raised"
+                padding="space.300"
+                borderRadius="border.radius"
+              >
+                <Inline space="space.300" alignBlock="start">
+                  {/* Stat */}
+                  <Stack space="space.050" alignInline="end">
+                    <span className={statClassMap[insight.color]}>{insight.stat}</span>
+                    <span className={styles.statLabel}>{insight.statLabel}</span>
+                  </Stack>
+
+                  <div className={styles.divider} />
+
+                  {/* Content */}
+                  <Stack space="space.200" grow="fill">
+                    <Inline space="space.100" alignBlock="center">
+                      <Text size="small" color="color.text.subtlest" weight="medium">
+                        {insight.category}
+                      </Text>
+                      <Lozenge appearance={impactAppearance[insight.impact]}>
+                        {insight.impact} impact
+                      </Lozenge>
+                    </Inline>
+
+                    <Text weight="semibold" color="color.text">{insight.title}</Text>
+                    <Text size="small" color="color.text.subtle">{insight.description}</Text>
+
+                    <div className={styles.actionTip}>
+                      <Sparkles size={12} className={styles.actionTipIcon} />
+                      <Text size="small" color="color.text.subtle">{insight.actionable}</Text>
+                    </div>
+                  </Stack>
+
+                  {/* Icon */}
+                  <div className={iconClassMap[insight.color]}>
+                    <Icon size={16} />
                   </div>
-                  <div className="text-xs font-mono text-white/25 leading-tight">
-                    {insight.statLabel}
-                  </div>
-                </div>
+                </Inline>
+              </Box>
+            );
+          })}
+        </Stack>
 
-                <div className="w-px self-stretch bg-white/[0.06]" />
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="section-label text-[10px]">
-                      {insight.category}
-                    </span>
-                    <span
-                      className={cn(
-                        "badge text-[10px] capitalize border",
-                        impactColors[insight.impact as keyof typeof impactColors]
-                      )}
-                    >
-                      {insight.impact} impact
-                    </span>
-                  </div>
-
-                  <h3 className="text-sm font-display font-semibold text-white/90 mb-2">
-                    {insight.title}
-                  </h3>
-
-                  <p className="text-xs text-white/40 leading-relaxed mb-3">
-                    {insight.description}
-                  </p>
-
-                  {/* Actionable */}
-                  <div className="flex items-start gap-2 p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.05]">
-                    <Sparkles className="w-3 h-3 text-neural-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-neural-300/70">{insight.actionable}</p>
-                  </div>
-                </div>
-
-                {/* Icon */}
-                <div
-                  className={cn(
-                    "w-9 h-9 rounded-xl flex items-center justify-center border flex-shrink-0",
-                    colorClass
-                  )}
-                >
-                  <Icon className="w-4 h-4" />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* AI note */}
-      <div className="flex items-start gap-3 p-4 rounded-2xl bg-neural-400/5 border border-neural-400/15 animate-in stagger-6">
-        <Brain className="w-4 h-4 text-neural-400 flex-shrink-0 mt-0.5" />
-        <div>
-          <p className="text-xs font-medium text-neural-300 mb-0.5">How AIPE generates insights</p>
-          <p className="text-xs text-white/30 leading-relaxed">
+        {/* ── AI Note ─────────────────────────────────────── */}
+        <SectionMessage
+          appearance="information"
+          title="How AIPE generates insights"
+        >
+          <Text size="small">
             Insights are generated by correlating thousands of behavioral signals across sessions.
             Pattern confidence requires a minimum of 3 sessions before surfacing. All analysis
             happens locally — no behavioral data is transmitted externally.
-          </p>
-        </div>
-      </div>
-    </div>
+          </Text>
+        </SectionMessage>
+
+      </Stack>
+    </Box>
   );
 }

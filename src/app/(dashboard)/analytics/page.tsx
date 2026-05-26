@@ -1,34 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useUIStore } from "@/lib/store/ui.store";
-import { MetricCard } from "@/components/ui/MetricCard";
-import { cn } from "@/lib/utils";
+import { Stack, Box, Inline, Grid, Text } from "@atlaskit/primitives";
+import Heading from "@atlaskit/heading";
+import Lozenge from "@atlaskit/lozenge";
+import Tabs, { Tab, TabList, TabPanel } from "@atlaskit/tabs";
 import {
-  BarChart2,
-  TrendingUp,
-  Users,
-  Clock,
-  Activity,
-  MousePointer2,
-  Keyboard,
-  ArrowUpRight,
-} from "lucide-react";
-import {
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  RadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-  Cell,
+  BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis,
+  ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
+import { MousePointer2, Keyboard, Activity } from "lucide-react";
+import styles from "./page.module.css";
 
 const weekData = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => ({
   day,
@@ -38,40 +21,51 @@ const weekData = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => 
 }));
 
 const radarData = [
-  { metric: "Keyboard Use", value: 82 },
+  { metric: "Keyboard Use",   value: 82 },
   { metric: "Click Accuracy", value: 91 },
-  { metric: "Flow State", value: 67 },
-  { metric: "Shortcut Use", value: 74 },
-  { metric: "Feature Depth", value: 58 },
-  { metric: "Consistency", value: 79 },
+  { metric: "Flow State",     value: 67 },
+  { metric: "Shortcut Use",   value: 74 },
+  { metric: "Feature Depth",  value: 58 },
+  { metric: "Consistency",    value: 79 },
 ];
 
 const heatmapData = Array.from({ length: 7 * 24 }, (_, i) => ({
-  day: Math.floor(i / 24),
-  hour: i % 24,
+  day:   Math.floor(i / 24),
+  hour:  i % 24,
   value: Math.random() > 0.6 ? Math.floor(Math.random() * 100) : 0,
 }));
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+const tickProps = {
+  fontSize: 10,
+  fill: "var(--ds-text-subtlest)",
+  fontFamily: "var(--font-mono)",
+};
+
+const ChartTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="card-base px-3 py-2.5 min-w-28">
-      <div className="text-xs font-mono text-white/40 mb-1">{label}</div>
+    <div className={styles.tooltip}>
+      <div className={styles.tooltipLabel}>{label}</div>
       {payload.map((p: any) => (
-        <div key={p.dataKey} className="flex items-center justify-between gap-3">
-          <span className="text-xs text-white/50 capitalize">{p.dataKey}</span>
-          <span className="text-xs font-mono font-medium" style={{ color: p.color }}>
-            {Math.round(p.value)}
-          </span>
+        <div key={p.dataKey} className={styles.tooltipRow}>
+          <span className={styles.tooltipKey}>{p.dataKey}</span>
+          <span className={styles.tooltipVal} style={{ color: p.color }}>{Math.round(p.value)}</span>
         </div>
       ))}
     </div>
   );
 };
 
+const statItems = [
+  { Icon: MousePointer2, label: "Click Events",     value: "2,847",  sub: "+18% vs last week", iconClass: styles.statIconQuantum },
+  { Icon: Keyboard,      label: "Keystrokes",       value: "14,302", sub: "65 WPM average",    iconClass: styles.statIconNeural  },
+  { Icon: Activity,      label: "Scroll Distance",  value: "18.4m",  sub: "Total this week",   iconClass: styles.statIconSynapse },
+];
+
 export default function AnalyticsPage() {
   const { setBreadcrumbs } = useUIStore();
-  const [activeTab, setActiveTab] = useState<"overview" | "behavior" | "ai">("overview");
 
   useEffect(() => {
     setBreadcrumbs([
@@ -81,167 +75,171 @@ export default function AnalyticsPage() {
   }, [setBreadcrumbs]);
 
   return (
-    <div className="max-w-[var(--content-max-width)] mx-auto px-6 py-8 space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between animate-in stagger-1">
-        <div>
-          <h1 className="text-2xl font-display font-bold text-white mb-1">
-            Analytics
-          </h1>
-          <p className="text-sm text-white/35">
+    <Box padding="space.400">
+      <Stack space="space.400">
+
+        {/* ── Header ──────────────────────────────────────── */}
+        <Stack space="space.100">
+          <Heading size="xlarge">Analytics</Heading>
+          <Text color="color.text.subtle">
             Session metrics, behavioral patterns, and AI adaptation history
-          </p>
-        </div>
-        <div className="flex items-center gap-1 p-1 glass rounded-xl border border-white/[0.07]">
-          {(["overview", "behavior", "ai"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={cn(
-                "px-4 py-1.5 rounded-lg text-xs font-medium capitalize transition-all duration-150",
-                activeTab === tab
-                  ? "bg-white/[0.1] text-white"
-                  : "text-white/30 hover:text-white/60"
-              )}
-            >
-              {tab}
-            </button>
+          </Text>
+        </Stack>
+
+        {/* ── Metric Row ──────────────────────────────────── */}
+        <Grid templateColumns="repeat(4, 1fr)" gap="space.200">
+          {[
+            { label: "Total Sessions", value: "47",  appearance: "inprogress" as const, note: "+12 this week" },
+            { label: "Avg Session",    value: "34m", appearance: "new" as const,        note: "+5 vs last week" },
+            { label: "AI Adaptations", value: "183", appearance: "success" as const,    note: "+24 this week" },
+            { label: "Power Score",    value: "78%", appearance: "moved" as const,      note: "+3 improvement" },
+          ].map(({ label, value, appearance, note }) => (
+            <Box key={label} backgroundColor="elevation.surface.raised" padding="space.300" borderRadius="border.radius">
+              <Stack space="space.100">
+                <Text size="small" color="color.text.subtlest" weight="medium">{label}</Text>
+                <Inline space="space.100" alignBlock="center">
+                  <Text size="large" weight="bold" color="color.text">{value}</Text>
+                  <Lozenge appearance={appearance}>{note}</Lozenge>
+                </Inline>
+              </Stack>
+            </Box>
           ))}
-        </div>
-      </div>
+        </Grid>
 
-      {/* Metrics row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-in stagger-2">
-        <MetricCard label="Total Sessions" value="47" delta={12} deltaLabel="this week" accent="quantum" />
-        <MetricCard label="Avg Session" value="34" unit="min" delta={5} deltaLabel="vs last week" accent="neural" />
-        <MetricCard label="AI Adaptations" value="183" delta={24} deltaLabel="this week" accent="synapse" live />
-        <MetricCard label="Power Score" value="78" unit="%" delta={3} deltaLabel="improvement" accent="plasma" />
-      </div>
+        {/* ── Tabs ────────────────────────────────────────── */}
+        <Tabs id="analytics-tabs">
+          <TabList>
+            <Tab>Overview</Tab>
+            <Tab>Behavior</Tab>
+            <Tab>AI Engine</Tab>
+          </TabList>
 
-      {/* Weekly chart */}
-      <div className="grid grid-cols-12 gap-4 animate-in stagger-3">
-        <div className="col-span-12 lg:col-span-8 card-base p-5">
-          <div className="flex items-center justify-between mb-5">
-            <div>
-              <h2 className="text-sm font-display font-semibold text-white/90">Weekly Overview</h2>
-              <p className="text-xs text-white/30 font-mono mt-0.5">Sessions & adaptations per day</p>
-            </div>
-            <span className="badge bg-quantum-400/10 text-quantum-300 border-quantum-400/20 text-xs">
-              7-day view
-            </span>
-          </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={weekData} barGap={4} margin={{ left: -20 }}>
-              <XAxis
-                dataKey="day"
-                tick={{ fontSize: 10, fill: "rgba(255,255,255,0.2)", fontFamily: "JetBrains Mono" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 10, fill: "rgba(255,255,255,0.2)", fontFamily: "JetBrains Mono" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="sessions" fill="#0EA5E9" opacity={0.8} radius={[4, 4, 0, 0]} maxBarSize={24} />
-              <Bar dataKey="adaptations" fill="#8B5CF6" opacity={0.8} radius={[4, 4, 0, 0]} maxBarSize={24} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+          {/* Overview */}
+          <TabPanel>
+            <Box paddingBlockStart="space.300">
+              <Grid templateColumns="8fr 4fr" gap="space.200">
+                <Box backgroundColor="elevation.surface.raised" padding="space.300" borderRadius="border.radius">
+                  <Stack space="space.300">
+                    <Inline spread="space-between" alignBlock="center">
+                      <Stack space="space.025">
+                        <Text weight="semibold" color="color.text">Weekly Overview</Text>
+                        <Text size="small" color="color.text.subtlest">Sessions &amp; adaptations per day</Text>
+                      </Stack>
+                      <Lozenge appearance="inprogress">7-day view</Lozenge>
+                    </Inline>
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart data={weekData} barGap={4} margin={{ left: -20 }}>
+                        <XAxis dataKey="day" tick={tickProps} axisLine={false} tickLine={false} />
+                        <YAxis tick={tickProps} axisLine={false} tickLine={false} />
+                        <Tooltip content={<ChartTooltip />} />
+                        <Bar dataKey="sessions"    fill="#4F80FF" opacity={0.85} radius={[4,4,0,0]} maxBarSize={24} />
+                        <Bar dataKey="adaptations" fill="#A78BFA" opacity={0.85} radius={[4,4,0,0]} maxBarSize={24} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </Stack>
+                </Box>
 
-        {/* Behavior radar */}
-        <div className="col-span-12 lg:col-span-4 card-base p-5">
-          <h2 className="text-sm font-display font-semibold text-white/90 mb-1">Behavior Profile</h2>
-          <p className="text-xs text-white/30 font-mono mb-3">Interaction quality metrics</p>
-          <ResponsiveContainer width="100%" height={200}>
-            <RadarChart data={radarData}>
-              <PolarGrid stroke="rgba(255,255,255,0.06)" />
-              <PolarAngleAxis
-                dataKey="metric"
-                tick={{ fontSize: 9, fill: "rgba(255,255,255,0.25)", fontFamily: "JetBrains Mono" }}
-              />
-              <Radar
-                dataKey="value"
-                stroke="#8B5CF6"
-                fill="#8B5CF6"
-                fillOpacity={0.15}
-                strokeWidth={1.5}
-              />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+                <Box backgroundColor="elevation.surface.raised" padding="space.300" borderRadius="border.radius">
+                  <Stack space="space.200">
+                    <Text weight="semibold" color="color.text">Behavior Profile</Text>
+                    <Text size="small" color="color.text.subtlest">Interaction quality metrics</Text>
+                    <ResponsiveContainer width="100%" height={200}>
+                      <RadarChart data={radarData}>
+                        <PolarGrid stroke="var(--ds-border)" />
+                        <PolarAngleAxis dataKey="metric" tick={{ fontSize: 9, fill: "var(--ds-text-subtlest)", fontFamily: "var(--font-mono)" }} />
+                        <Radar dataKey="value" stroke="#A78BFA" fill="#A78BFA" fillOpacity={0.15} strokeWidth={1.5} />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </Stack>
+                </Box>
+              </Grid>
+            </Box>
+          </TabPanel>
 
-      {/* Heatmap — simplified */}
-      <div className="card-base p-5 animate-in stagger-4">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-sm font-display font-semibold text-white/90">Activity Heatmap</h2>
-            <p className="text-xs text-white/30 font-mono mt-0.5">Hour of day × Day of week</p>
-          </div>
-          <div className="flex items-center gap-2 text-xs font-mono text-white/25">
-            <div className="w-3 h-3 rounded-sm bg-quantum-400/20" />
-            <span>Low</span>
-            <div className="w-3 h-3 rounded-sm bg-quantum-400/60" />
-            <span>Medium</span>
-            <div className="w-3 h-3 rounded-sm bg-quantum-400" />
-            <span>High</span>
-          </div>
-        </div>
-        <div className="grid gap-1" style={{ gridTemplateColumns: "repeat(24, 1fr)" }}>
-          {Array.from({ length: 24 }, (_, hour) => (
-            <div key={hour} className="space-y-1">
-              <div className="text-center text-[8px] font-mono text-white/15 h-3">
-                {hour % 6 === 0 ? hour : ""}
-              </div>
-              {Array.from({ length: 7 }, (_, day) => {
-                const entry = heatmapData.find((d) => d.day === day && d.hour === hour);
-                const v = entry?.value ?? 0;
-                return (
-                  <div
-                    key={day}
-                    className="h-4 rounded-sm transition-all duration-150 hover:scale-110 cursor-default"
-                    style={{
-                      background: v > 0
-                        ? `rgba(14,165,233,${v / 100 * 0.8 + 0.1})`
-                        : "rgba(255,255,255,0.03)",
-                    }}
-                    title={`${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][day]} ${hour}:00 — ${v} interactions`}
-                  />
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
+          {/* Behavior */}
+          <TabPanel>
+            <Box paddingBlockStart="space.300">
+              <Stack space="space.300">
+                {/* Activity Heatmap */}
+                <Box backgroundColor="elevation.surface.raised" padding="space.300" borderRadius="border.radius">
+                  <Stack space="space.300">
+                    <Inline spread="space-between" alignBlock="center">
+                      <Stack space="space.025">
+                        <Text weight="semibold" color="color.text">Activity Heatmap</Text>
+                        <Text size="small" color="color.text.subtlest">Hour of day × Day of week</Text>
+                      </Stack>
+                      <Inline space="space.100" alignBlock="center">
+                        <span className={`${styles.legendDot} ${styles.swatchLow}`} />
+                        <Text size="small" color="color.text.subtlest">Low</Text>
+                        <span className={`${styles.legendDot} ${styles.swatchMed}`} />
+                        <Text size="small" color="color.text.subtlest">Medium</Text>
+                        <span className={`${styles.legendDot} ${styles.swatchHigh}`} />
+                        <Text size="small" color="color.text.subtlest">High</Text>
+                      </Inline>
+                    </Inline>
+                    <div className={styles.heatmapGrid}>
+                      {Array.from({ length: 24 }, (_, hour) => (
+                        <div key={hour} className={styles.heatmapCol}>
+                          <div className={styles.heatmapHour}>{hour % 6 === 0 ? hour : ""}</div>
+                          {Array.from({ length: 7 }, (_, day) => {
+                            const entry = heatmapData.find((d) => d.day === day && d.hour === hour);
+                            const v = entry?.value ?? 0;
+                            const cellClass = v === 0
+                              ? styles.heatmapCellEmpty
+                              : v < 33
+                              ? styles.heatmapCellLow
+                              : v < 66
+                              ? styles.heatmapCellMed
+                              : styles.heatmapCellHigh;
+                            return (
+                              <div
+                                key={day}
+                                className={`${styles.heatmapCell} ${cellClass}`}
+                                title={`${DAYS[day]} ${hour}:00 — ${v} interactions`}
+                              />
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  </Stack>
+                </Box>
 
-      {/* Interaction breakdown */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in stagger-5">
-        {[
-          { icon: MousePointer2, label: "Click Events", value: "2,847", sub: "+18% vs last week", color: "quantum" },
-          { icon: Keyboard, label: "Keystrokes", value: "14,302", sub: "65 WPM average", color: "neural" },
-          { icon: Activity, label: "Scroll Distance", value: "18.4m", sub: "Total this week", color: "synapse" },
-        ].map((item) => (
-          <div key={item.label} className="card-base p-4 flex items-center gap-4">
-            <div
-              className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center border flex-shrink-0",
-                item.color === "quantum" && "bg-quantum-400/10 border-quantum-400/20 text-quantum-400",
-                item.color === "neural" && "bg-neural-400/10 border-neural-400/20 text-neural-400",
-                item.color === "synapse" && "bg-synapse-400/10 border-synapse-400/20 text-synapse-400"
-              )}
-            >
-              <item.icon className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-xl font-display font-bold text-white tabular-nums">{item.value}</div>
-              <div className="text-xs font-mono text-white/30">{item.label}</div>
-              <div className="text-xs text-white/20">{item.sub}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+                {/* Interaction breakdown */}
+                <Grid templateColumns="repeat(3, 1fr)" gap="space.200">
+                  {statItems.map(({ Icon, label, value, sub, iconClass }) => (
+                    <Box key={label} backgroundColor="elevation.surface.raised" padding="space.300" borderRadius="border.radius">
+                      <Inline space="space.200" alignBlock="center">
+                        <div className={iconClass}>
+                          <Icon size={20} />
+                        </div>
+                        <Stack space="space.050">
+                          <Text size="large" weight="bold" color="color.text">{value}</Text>
+                          <Text size="small" weight="medium" color="color.text.subtle">{label}</Text>
+                          <Text size="small" color="color.text.subtlest">{sub}</Text>
+                        </Stack>
+                      </Inline>
+                    </Box>
+                  ))}
+                </Grid>
+              </Stack>
+            </Box>
+          </TabPanel>
+
+          {/* AI Engine */}
+          <TabPanel>
+            <Box paddingBlockStart="space.300">
+              <Box backgroundColor="elevation.surface.raised" padding="space.400" borderRadius="border.radius">
+                <Stack space="space.200" alignInline="center">
+                  <Lozenge appearance="inprogress" isBold>AI Engine Analytics</Lozenge>
+                  <Text color="color.text.subtle">Detailed AI adaptation metrics coming soon</Text>
+                </Stack>
+              </Box>
+            </Box>
+          </TabPanel>
+        </Tabs>
+
+      </Stack>
+    </Box>
   );
 }

@@ -13,6 +13,7 @@ import { getTimeOfDayGreeting } from "@/lib/utils";
 import {
   AreaChart, Area, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
+import styles from "./page.module.css";
 
 const sessionData = Array.from({ length: 24 }, (_, i) => ({
   hour: `${i.toString().padStart(2, "0")}:00`,
@@ -40,12 +41,12 @@ const typeAppearance: Record<string, "inprogress" | "success" | "moved" | "new">
 const ChartTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="card-base" style={{ padding: "8px 12px", minWidth: 128 }}>
-      <div style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--ds-text-subtlest)", marginBottom: 6 }}>{label}</div>
+    <div className={styles.tooltip}>
+      <div className={styles.tooltipLabel}>{label}</div>
       {payload.map((p: any) => (
-        <div key={p.dataKey} style={{ display: "flex", justifyContent: "space-between", gap: 16, fontSize: 11 }}>
-          <span style={{ color: "var(--ds-text-subtle)", textTransform: "capitalize" }}>{p.dataKey}</span>
-          <span style={{ fontFamily: "var(--font-mono)", fontWeight: 600, color: p.color }}>{Math.round(p.value)}</span>
+        <div key={p.dataKey} className={styles.tooltipRow}>
+          <span className={styles.tooltipKey}>{p.dataKey}</span>
+          <span className={styles.tooltipVal} style={{ color: p.color }}>{Math.round(p.value)}</span>
         </div>
       ))}
     </div>
@@ -146,11 +147,11 @@ export default function DashboardPage() {
                 </Stack>
                 <Inline space="space.200">
                   <Text size="small" color="color.text.subtlest">
-                    <span style={{ display: "inline-block", width: 10, height: 2, background: C.quantum, borderRadius: 2, marginRight: 4, verticalAlign: "middle" }} />
+                    <span className={styles.quantumSwatch} />
                     Interactions
                   </Text>
                   <Text size="small" color="color.text.subtlest">
-                    <span style={{ display: "inline-block", width: 10, height: 2, background: C.neural, borderRadius: 2, marginRight: 4, verticalAlign: "middle" }} />
+                    <span className={styles.neuralSwatch} />
                     Adaptations
                   </Text>
                 </Inline>

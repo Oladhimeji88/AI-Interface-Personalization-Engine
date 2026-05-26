@@ -1,0 +1,154 @@
+/* Per-theme CSS custom properties — values from COLOR_PRESETS */
+.themeQuantumDark {
+  --t-bg:      #050508;
+  --t-surface: rgba(255,255,255,0.04);
+  --t-border:  rgba(255,255,255,0.08);
+  --t-primary: #0ea5e9;
+  --t-secondary: #8b5cf6;
+  --t-accent:  #10b981;
+  --t-muted:   rgba(248,250,252,0.5);
+}
+
+.themeNeuralFocus {
+  --t-bg:      #07070f;
+  --t-surface: rgba(139,92,246,0.06);
+  --t-border:  rgba(139,92,246,0.15);
+  --t-primary: #8b5cf6;
+  --t-secondary: #0ea5e9;
+  --t-accent:  #f97316;
+  --t-muted:   rgba(248,250,252,0.45);
+}
+
+.themeSynapseGreen {
+  --t-bg:      #050a07;
+  --t-surface: rgba(16,185,129,0.05);
+  --t-border:  rgba(16,185,129,0.12);
+  --t-primary: #10b981;
+  --t-secondary: #0ea5e9;
+  --t-accent:  #8b5cf6;
+  --t-muted:   rgba(236,253,245,0.45);
+}
+
+.themeMinimalLight {
+  --t-bg:      #f8fafc;
+  --t-surface: rgba(0,0,0,0.03);
+  --t-border:  rgba(0,0,0,0.08);
+  --t-primary: #0f172a;
+  --t-secondary: #475569;
+  --t-accent:  #0ea5e9;
+  --t-muted:   rgba(15,23,42,0.5);
+}
+
+/* Preview shell */
+.preview {
+  height: 112px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--t-bg);
+}
+
+.previewSidebar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 25%;
+  border-right: 1px solid var(--t-border);
+  background: rgba(255,255,255,0.03);
+}
+
+.previewContent {
+  position: absolute;
+  left: 25%;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.previewBar {
+  height: 8px;
+  border-radius: 100px;
+  width: 75%;
+  background: var(--t-primary);
+  opacity: 0.8;
+}
+
+.previewSubbar {
+  height: 6px;
+  border-radius: 100px;
+  background: var(--t-muted);
+}
+
+.previewCard {
+  height: 28px;
+  border-radius: 8px;
+  background: var(--t-surface);
+  border: 1px solid var(--t-border);
+}
+
+.previewChips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.previewChip {
+  height: 20px;
+  border-radius: 6px;
+  opacity: 0.6;
+}
+
+.chipPrimary   { composes: previewChip; background: var(--t-primary);   }
+.chipSecondary { composes: previewChip; background: var(--t-secondary); }
+.chipAccent    { composes: previewChip; background: var(--t-accent);    }
+
+/* Color swatches bottom-right */
+.previewSwatches {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 6px;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+}
+
+.swatchPrimary   { composes: swatch; background: var(--t-primary);   }
+.swatchSecondary { composes: swatch; background: var(--t-secondary); }
+.swatchAccent    { composes: swatch; background: var(--t-accent);    }
+
+/* Active check badge */
+.activeBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #34d399;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.aiNote {
+  background: rgba(79, 128, 255, 0.05);
+  border: 1px solid rgba(79, 128, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.aiNoteIcon { color: #4f80ff; flex-shrink: 0; margin-top: 2px; }

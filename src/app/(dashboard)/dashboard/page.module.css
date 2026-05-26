@@ -1,0 +1,50 @@
+.tooltip {
+  padding: 8px 12px;
+  min-width: 128px;
+  background: var(--ds-surface-overlay);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-border-radius);
+}
+
+.tooltipLabel {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--ds-text-subtlest);
+  margin-bottom: 6px;
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 11px;
+}
+
+.tooltipKey {
+  color: var(--ds-text-subtle);
+  text-transform: capitalize;
+}
+
+.tooltipVal {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.legendSwatch {
+  display: inline-block;
+  width: 10px;
+  height: 2px;
+  border-radius: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.quantumSwatch {
+  composes: legendSwatch;
+  background: #4f80ff;
+}
+
+.neuralSwatch {
+  composes: legendSwatch;
+  background: #a78bfa;
+}
