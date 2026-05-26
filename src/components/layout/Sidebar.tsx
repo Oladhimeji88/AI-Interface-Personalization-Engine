@@ -33,6 +33,12 @@ const NAV_ITEMS = [
     ],
   },
   {
+    group: "AI",
+    items: [
+      { href: "/chat", label: "AI Assistant" },
+    ],
+  },
+  {
     group: "System",
     items: [
       { href: "/settings", label: "Settings" },
