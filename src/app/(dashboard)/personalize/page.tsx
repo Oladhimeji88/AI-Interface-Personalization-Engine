@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUIStore } from "@/lib/store/ui.store";
 import { usePersonalizationStore } from "@/lib/store/personalization.store";
 import { PersonalizationEngine } from "@/lib/ai/personalization-engine";
@@ -15,6 +15,40 @@ import { Check, RotateCcw } from "lucide-react";
 import styles from "./page.module.css";
 
 const PALETTE_PRESETS = PersonalizationEngine.getPresetPalettes();
+
+function ColorSwatch({ color }: { color: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { ref.current?.style.setProperty("--swatch-color", color); }, [color]);
+  return <div ref={ref} className={styles.colorSwatch} />;
+}
+
+function PalettePreview({ bg, surface }: { bg: string; surface: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.style.setProperty("--p-bg", bg);
+    ref.current?.style.setProperty("--p-surface", surface);
+  }, [bg, surface]);
+  return <div ref={ref} className={styles.palettePreview} />;
+}
+
+function PickerSwatch({ color, onChange, label }: { color: string; onChange: (v: string) => void; label: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { ref.current?.style.setProperty("--picker-color", color); }, [color]);
+  return (
+    <div ref={ref} className={styles.pickerSwatch}>
+      <input type="color" value={color} onChange={(e) => onChange(e.target.value)} aria-label={label} className={styles.pickerInput} />
+    </div>
+  );
+}
+
+function TypographyPreview({ text, lineHeight, letterSpacing }: { text: string; lineHeight?: number; letterSpacing?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (lineHeight !== undefined)   ref.current?.style.setProperty("--preview-lh", String(lineHeight));
+    if (letterSpacing !== undefined) ref.current?.style.setProperty("--preview-ls", `${letterSpacing}em`);
+  }, [lineHeight, letterSpacing]);
+  return <div ref={ref} className={styles.typographyPreview}>{text}</div>;
+}
 
 const FONT_SCALE_MAP: Record<string, { size: number; class: string }> = {
   xs: { size: 10, class: styles.fontScale10 },
@@ -105,25 +139,12 @@ export default function PersonalizePage() {
                           >
                             <Stack space="space.150">
                               <Inline space="space.100" alignBlock="center">
-                                {/* CSS var approach for dynamic swatch colors */}
-                                <div
-                                  className={styles.colorSwatch}
-                                  style={{ "--swatch-color": palette.primary } as React.CSSProperties}
-                                />
-                                <div
-                                  className={styles.colorSwatch}
-                                  style={{ "--swatch-color": palette.secondary } as React.CSSProperties}
-                                />
-                                <div
-                                  className={styles.colorSwatch}
-                                  style={{ "--swatch-color": palette.accent } as React.CSSProperties}
-                                />
+                                  <ColorSwatch color={palette.primary}   />
+                                <ColorSwatch color={palette.secondary} />
+                                <ColorSwatch color={palette.accent}    />
                                 {isActive && <Check size={14} color="#34d399" />}
                               </Inline>
-                              <div
-                                className={styles.palettePreview}
-                                style={{ "--p-bg": palette.background, "--p-surface": palette.surface } as React.CSSProperties}
-                              />
+                              <PalettePreview bg={palette.background} surface={palette.surface} />
                               <Text size="small" color="color.text.subtle" weight="medium">
                                 {key.replace(/-/g, " ")}
                               </Text>
@@ -143,25 +164,18 @@ export default function PersonalizePage() {
                         <Text size="small" color="color.text.subtlest" weight="medium" as="span">
                           {key}
                         </Text>
-                        <div
-                          className={styles.pickerSwatch}
-                          style={{ "--picker-color": profile.colors[key] } as React.CSSProperties}
-                        >
-                          <input
-                            type="color"
-                            value={profile.colors[key]}
-                            onChange={(e) => updateProfile({ colors: { ...profile.colors, [key]: e.target.value } })}
-                            aria-label={`${key} color picker`}
-                            className={styles.pickerInput}
-                          />
-                        </div>
+                        <PickerSwatch
+                          color={profile.colors[key]}
+                          onChange={(v) => updateProfile({ colors: { ...profile.colors, [key]: v } })}
+                          label={`${key} color picker`}
+                        />
                         <Box backgroundColor="elevation.surface" padding="space.100" borderRadius="border.radius" grow="fill">
                           <input
                             type="text"
                             value={profile.colors[key]}
                             onChange={(e) => updateProfile({ colors: { ...profile.colors, [key]: e.target.value } })}
                             aria-label={`${key} hex value`}
-                            style={{ background: "transparent", border: "none", outline: "none", color: "var(--ds-text)", fontFamily: "var(--font-mono)", fontSize: 12, width: "100%" }}
+                            className={styles.tokenInput}
                           />
                         </Box>
                       </Inline>
@@ -241,7 +255,7 @@ export default function PersonalizePage() {
                       type="range" min={180} max={360} aria-label="Sidebar width"
                       value={profile.layout.sidebarWidth}
                       onChange={(e) => updateProfile({ layout: { ...profile.layout, sidebarWidth: Number(e.target.value) } })}
-                      style={{ width: "100%", accentColor: "var(--ds-background-brand-bold)" }}
+                      className={styles.rangeInput}
                     />
                   </Stack>
                 </Box>
@@ -291,14 +305,12 @@ export default function PersonalizePage() {
                       type="range" min={1.2} max={2.0} step={0.05} aria-label="Line height"
                       value={profile.typography.lineHeight}
                       onChange={(e) => updateProfile({ typography: { ...profile.typography, lineHeight: Number(e.target.value) } })}
-                      style={{ width: "100%", accentColor: "var(--ds-background-brand-bold)" }}
+                      className={styles.rangeInput}
                     />
-                    <div
-                      className={styles.typographyPreview}
-                      style={{ "--preview-lh": profile.typography.lineHeight } as React.CSSProperties}
-                    >
-                      The quick brown fox jumps over the lazy dog. Interface density follows cognitive patterns.
-                    </div>
+                    <TypographyPreview
+                      text="The quick brown fox jumps over the lazy dog. Interface density follows cognitive patterns."
+                      lineHeight={profile.typography.lineHeight}
+                    />
                   </Stack>
                 </Box>
 
@@ -312,14 +324,12 @@ export default function PersonalizePage() {
                       type="range" min={-0.05} max={0.1} step={0.005} aria-label="Letter spacing"
                       value={profile.typography.letterSpacing}
                       onChange={(e) => updateProfile({ typography: { ...profile.typography, letterSpacing: Number(e.target.value) } })}
-                      style={{ width: "100%", accentColor: "var(--ds-background-brand-bold)" }}
+                      className={styles.rangeInput}
                     />
-                    <div
-                      className={styles.typographyPreview}
-                      style={{ "--preview-ls": `${profile.typography.letterSpacing}em` } as React.CSSProperties}
-                    >
-                      AIPE ADAPTIVE INTERFACE ENGINE
-                    </div>
+                    <TypographyPreview
+                      text="AIPE ADAPTIVE INTERFACE ENGINE"
+                      letterSpacing={profile.typography.letterSpacing}
+                    />
                   </Stack>
                 </Box>
 
@@ -367,7 +377,7 @@ export default function PersonalizePage() {
                       type="range" min={0} max={600} step={20} aria-label="Transition duration"
                       value={profile.motion.transitionDuration}
                       onChange={(e) => updateProfile({ motion: { ...profile.motion, transitionDuration: Number(e.target.value) } })}
-                      style={{ width: "100%", accentColor: "var(--ds-background-brand-bold)" }}
+                      className={styles.rangeInput}
                     />
                   </Stack>
                 </Box>
@@ -519,7 +529,7 @@ export default function PersonalizePage() {
                           type="range" min={0} max={100} aria-label={label}
                           value={aiSettings[key]}
                           onChange={(e) => updateAISettings({ [key]: Number(e.target.value) })}
-                          style={{ width: "100%", accentColor: "var(--ds-background-brand-bold)" }}
+                          className={styles.rangeInput}
                         />
                         <Text size="small" color="color.text.subtlest">{hint}</Text>
                       </Stack>
