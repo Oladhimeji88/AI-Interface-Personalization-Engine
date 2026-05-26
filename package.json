@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.98.0",
     "@atlaskit/atlassian-navigation": "^5.7.4",
     "@atlaskit/badge": "^18.6.0",
     "@atlaskit/button": "^23.11.8",
