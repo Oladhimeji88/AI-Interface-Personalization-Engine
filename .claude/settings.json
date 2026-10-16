@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\USER\\\\Desktop\\\\AI Interface Personalization Engine\\\\src\\\\app\\\\\\(dashboard\\)\\\\editor\")",
+      "Bash(Write-Output \"done\")",
+      "Read(//c/Users/USER/.claude/projects/c--Users-USER-Desktop-AI-Interface-Personalization-Engine/memory/**)",
+      "Bash(npm install *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\USER\\.claude\\projects\\c--Users-USER-Desktop-AI-Interface-Personalization-Engine\\memory"
+    ]
+  }
+}

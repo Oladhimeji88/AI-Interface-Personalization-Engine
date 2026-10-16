@@ -1,0 +1,114 @@
+.tooltip {
+  padding: 8px 12px;
+  min-width: 112px;
+  background: var(--ds-surface-overlay);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-border-radius);
+}
+
+.tooltipLabel {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--ds-text-subtlest);
+  margin-bottom: 4px;
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+}
+
+.tooltipKey {
+  color: var(--ds-text-subtle);
+  text-transform: capitalize;
+}
+
+.tooltipVal {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.heatmapGrid {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(24, 1fr);
+}
+
+.heatmapCol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heatmapHour {
+  text-align: center;
+  font-size: 8px;
+  font-family: var(--font-mono);
+  color: var(--ds-text-subtlest);
+  height: 12px;
+}
+
+.heatmapCell {
+  height: 16px;
+  border-radius: 3px;
+  transition: transform 0.15s;
+  cursor: default;
+}
+
+.heatmapCell:hover {
+  transform: scale(1.1);
+}
+
+.legendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.statIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-style: solid;
+  flex-shrink: 0;
+}
+
+.statIconQuantum {
+  composes: statIcon;
+  background: rgba(79, 128, 255, 0.1);
+  border-color: rgba(79, 128, 255, 0.2);
+  color: #4f80ff;
+}
+
+.statIconNeural {
+  composes: statIcon;
+  background: rgba(167, 139, 250, 0.1);
+  border-color: rgba(167, 139, 250, 0.2);
+  color: #a78bfa;
+}
+
+.statIconSynapse {
+  composes: statIcon;
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.2);
+  color: #34d399;
+}
+
+/* Heatmap cell intensity buckets */
+.heatmapCellEmpty { background: var(--ds-background-neutral); }
+.heatmapCellLow   { background: rgba(79, 128, 255, 0.2); }
+.heatmapCellMed   { background: rgba(79, 128, 255, 0.5); }
+.heatmapCellHigh  { background: rgba(79, 128, 255, 0.9); }
+
+/* Legend swatches for heatmap */
+.swatchLow  { background: rgba(79, 128, 255, 0.2); }
+.swatchMed  { background: rgba(79, 128, 255, 0.6); }
+.swatchHigh { background: #4f80ff; }
